@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useRouter } from 'vue-router'
 import { LayoutGrid, List, Settings } from 'lucide-vue-next'
 import { toast } from 'vue-sonner'
 import { Button } from '@/components/ui/button'
@@ -25,15 +24,16 @@ import EmptyState from '@/components/mod/EmptyState.vue'
 import ModTable from '@/components/mod/ModTable.vue'
 import ModCard from '@/components/mod/ModCard.vue'
 import ModDetailSheet from '@/components/mod/ModDetailSheet.vue'
+import SettingsDialog from '@/components/mod/SettingsDialog.vue'
 import { useModsStore } from '@/stores/mods'
 import type { ModFile } from '@/types/mod'
 
 const { t } = useI18n()
-const router = useRouter()
 const store = useModsStore()
 
 const selectedMod = ref<ModFile | null>(null)
 const detailOpen = ref(false)
+const settingsOpen = ref(false)
 
 const showEmpty = computed(() => {
   if (!store.supported) return true
@@ -122,7 +122,7 @@ onMounted(async () => {
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger as-child>
-                <Button variant="ghost" size="icon" @click="router.push('/settings')">
+                <Button variant="ghost" size="icon" @click="settingsOpen = true">
                   <Settings />
                 </Button>
               </TooltipTrigger>
@@ -183,5 +183,6 @@ onMounted(async () => {
     </main>
 
     <ModDetailSheet v-model="detailOpen" :mod="selectedMod" />
+    <SettingsDialog v-model="settingsOpen" />
   </div>
 </template>

@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { onMounted } from 'vue';
-import { RouterView } from 'vue-router'
 import { Toaster } from '@/components/ui/sonner'
 import { useSettingsStore } from './stores/settings';
+import HomeView from '@/views/HomeView.vue';
 
 onMounted(() => {
   const settingsStore = useSettingsStore();
@@ -12,6 +12,6 @@ onMounted(() => {
 </script>
 
 <template>
-  <RouterView />
+  <HomeView />
   <Toaster rich-colors position="top-right" />
 </template>
