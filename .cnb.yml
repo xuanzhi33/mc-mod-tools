@@ -1,0 +1,28 @@
+$:
+  vscode:
+    - runner:
+        cpus: 16
+      docker:
+        image:
+          name: docker.cnb.cool/xuanzhi33/dev-env:latest
+      services:
+        - docker
+        - name: vscode
+          options:
+            keepAliveTimeout: 24h
+      stages:
+        - name: ls
+          script: ls
+main:
+  push:
+    - name: Sync to Github
+      imports:
+        - https://cnb.cool/xuanzhi33/github-token/-/blob/main/repo.yml
+      stages:
+        - name: sync to github
+          image: tencentcom/git-sync
+          settings:
+            target_url: https://github.com/xuanzhi33/mc-mod-tools.git
+            auth_type: https
+            username: ${GIT_USERNAME}
+            password: ${GIT_ACCESS_TOKEN}
