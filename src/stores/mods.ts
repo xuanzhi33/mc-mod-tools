@@ -158,15 +158,22 @@ export const useModsStore = defineStore('mods', () => {
           }
         }),
       )
+      // 整体替换，触发响应式代理化
       modFiles.value = files
 
       if (cancelled) return
 
+      // 后续修改必须通过 modFiles.value 访问元素（代理对象），
+      // 否则直接修改原对象引用不会触发视图更新。
+
       // 2. 计算 SHA-1（并发限制）
       progress.value = { stage: 'hashing', total: files.length, processed: 0 }
       let hashed = 0
-      await runWithConcurrency(files, HASH_CONCURRENCY, async (m) => {
+      const indices = files.map((_, i) => i)
+      await runWithConcurrency(indices, HASH_CONCURRENCY, async (i) => {
         if (cancelled) return
+        const m = modFiles.value[i]
+        if (!m) return
         m.status = 'hashing'
         try {
           const file = await m.handle.getFile()
@@ -184,12 +191,14 @@ export const useModsStore = defineStore('mods', () => {
 
       // 3. 批量查询 versions by hash
       const hashToIndex = new Map<string, number>()
-      files.forEach((m, i) => {
+      for (let i = 0; i < modFiles.value.length; i++) {
+        const m = modFiles.value[i]
+        if (!m) continue
         if (m.sha1 && m.status !== 'error') {
           m.status = 'querying'
           hashToIndex.set(m.sha1, i)
         }
-      })
+      }
 
       const hashes = [...hashToIndex.keys()]
       if (hashes.length === 0) {
@@ -207,13 +216,13 @@ export const useModsStore = defineStore('mods', () => {
       for (const [hash, version] of Object.entries(versionMap)) {
         const idx = hashToIndex.get(hash)
         if (idx === undefined) continue
-        const m = files[idx]
+        const m = modFiles.value[idx]
         if (!m) continue
         m.version = version
         if (version.project_id) matchedProjectIds.add(version.project_id)
       }
       // 未匹配的标 not_found
-      for (const m of files) {
+      for (const m of modFiles.value) {
         if (m.status === 'querying' && !m.version) {
           m.status = 'not_found'
         }
@@ -236,7 +245,7 @@ export const useModsStore = defineStore('mods', () => {
         progress.value = { stage: 'querying-projects', total, processed: done }
       })
 
-      for (const m of files) {
+      for (const m of modFiles.value) {
         const pid = m.version?.project_id
         if (pid && projectMap[pid]) {
           m.project = projectMap[pid]
