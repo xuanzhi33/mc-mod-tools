@@ -43,7 +43,7 @@ const sectionTitleClass = 'font-semibold text-muted-foreground border-b pt-3 pb-
 </script>
 
 <template>
-  <Dialog v-model="open">
+  <Dialog v-model:open="open">
     <DialogContent class="sm:max-w-md">
       <DialogHeader>
         <DialogTitle class="flex items-center gap-2">

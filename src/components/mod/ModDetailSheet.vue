@@ -53,7 +53,7 @@ function formatBytes(n: number): string {
 </script>
 
 <template>
-  <Sheet v-model="open">
+  <Sheet v-model:open="open">
     <SheetContent
       side="right"
       class="w-full gap-0 sm:max-w-md overflow-y-auto"
