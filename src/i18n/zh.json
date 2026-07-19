@@ -1,6 +1,6 @@
 {
   "common": {
-    "title": "Vue 项目模板"
+    "title": "Modrinth 本地模组管理工具"
   },
   "settings": {
     "title": "设置",
@@ -17,6 +17,79 @@
         "en": "英语 - English",
         "zh": "简体中文 - Chinese (Simplified)"
       }
+    }
+  },
+  "mod": {
+    "pickFolder": "选择模组文件夹",
+    "changeFolder": "更换文件夹",
+    "rescan": "重新扫描",
+    "cancel": "取消",
+    "folderSelected": "已选择文件夹：{name}",
+    "folderSelectFailed": "选择文件夹失败",
+    "needPermission": "需要重新授权访问上次选择的文件夹",
+    "emptyTitle": "尚未选择模组文件夹",
+    "emptyDesc": "点击下方按钮选择本地的 Minecraft mods 文件夹，工具将自动扫描其中的 jar 文件并从 Modrinth 查询信息。",
+    "noJarsTitle": "未找到 jar 文件",
+    "noJarsDesc": "所选文件夹中没有发现 .jar 模组文件，请确认路径后重新选择。",
+    "unsupportedTitle": "浏览器不支持",
+    "unsupportedDesc": "本工具依赖 File System Access API，请使用 Chrome、Edge 或其他基于 Chromium 的浏览器（需 ≥86 版本）。",
+    "notFoundDesc": "该文件未在 Modrinth 找到对应项目，可能是本地私有模组或仅发布在 CurseForge。",
+    "searchPlaceholder": "搜索模组名、作者或文件名…",
+    "noResults": "没有匹配的模组",
+    "stage": {
+      "listing": "正在列出 jar 文件…",
+      "hashing": "正在计算文件哈希…",
+      "queryingVersions": "正在查询 Modrinth 版本信息…",
+      "queryingProjects": "正在查询 Modrinth 项目详情…",
+      "done": "扫描完成",
+      "error": "扫描出错"
+    },
+    "status": {
+      "pending": "待处理",
+      "hashing": "计算中",
+      "querying": "查询中",
+      "matched": "已识别",
+      "not_found": "未识别",
+      "error": "错误"
+    },
+    "filter": {
+      "all": "全部",
+      "matched": "已识别",
+      "not_found": "未识别",
+      "error": "错误"
+    },
+    "view": {
+      "table": "表格视图",
+      "card": "卡片视图"
+    },
+    "col": {
+      "modName": "模组名称",
+      "version": "版本",
+      "mcVersions": "MC 版本",
+      "loaders": "加载器",
+      "author": "作者",
+      "downloads": "下载量",
+      "status": "状态"
+    },
+    "statsTotal": "共 {n} 个文件",
+    "statsMatched": "已识别 {n}",
+    "statsNotFound": "未识别 {n}",
+    "statsError": "错误 {n}",
+    "statsDownloads": "累计下载 {n}",
+    "detail": {
+      "description": "描述",
+      "projectInfo": "项目信息",
+      "versionInfo": "版本信息",
+      "fileInfo": "文件信息",
+      "author": "作者",
+      "downloads": "下载量",
+      "follows": "关注数",
+      "updated": "最近更新",
+      "published": "发布时间",
+      "filePath": "文件路径",
+      "fileSize": "文件大小",
+      "error": "错误信息",
+      "viewVersion": "查看版本"
     }
   }
 }

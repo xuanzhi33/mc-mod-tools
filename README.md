@@ -1,6 +1,47 @@
-# Vue 3 项目模板 / Vue 3 Project Template
+# Modrinth 本地模组管理工具 / Modrinth Local Mod Manager
 
 [English](#english) | [中文](#chinese)
+
+---
+
+<a name="zh-tool-intro"></a>
+
+## 🎮 中文简介
+
+一个纯前端的 Minecraft 模组管理工具。借助浏览器原生 **File System Access API**，让用户选择本地的 `mods` 文件夹，自动扫描其中的 `.jar` 文件，计算 SHA-1 哈希并调用 [Modrinth API](https://docs.modrinth.com/) 查询元信息（名称、版本、作者、下载量、MC 版本、加载器等），统一展示在页面上。
+
+### 特性
+
+- **纯前端**：无后端、无数据库，所有数据通过 Modrinth 公开 API 获取
+- **本地读取**：使用 Chrome 自带的 File System Access API 选择并读取本地文件夹
+- **批量识别**：自动计算 jar 文件 SHA-1，批量调用 `/version_files` + `/projects` 查询
+- **句柄持久化**：通过 IndexedDB 保存文件夹句柄，刷新页面后无需重选
+- **表格 / 卡片双视图**：可切换紧凑表格或图标卡片
+- **状态过滤与搜索**：按识别状态过滤、按名称/作者/文件名搜索
+- **详情侧滑面板**：点击查看完整模组信息与 Modrinth 外链
+- **中英文 i18n + 深色模式**
+
+### 浏览器要求
+
+需要支持 File System Access API 的 Chromium 浏览器（Chrome / Edge / Brave 等，版本 ≥ 86）。Firefox 与 Safari 暂不支持，页面会显示降级提示。
+
+### 工作流程
+
+1. 用户点击「选择模组文件夹」 → `showDirectoryPicker()`
+2. 递归遍历文件夹，列出所有 `.jar` 文件
+3. 并发（限流 4）计算每个文件的 SHA-1 哈希
+4. 每 10 个哈希一批 `POST /v2/version_files` 查询版本
+5. 收集所有 `project_id`，每 100 个一批 `GET /v2/projects?ids=[...]` 查询项目详情
+6. 将结果聚合到 `ModFile[]`，渲染到表格 / 卡片
+
+### 相关代码
+
+- `src/lib/fs.ts` — File System Access API 封装（选目录、列 jar、句柄持久化）
+- `src/lib/hash.ts` — SHA-1/SHA-512 计算（`crypto.subtle.digest`）
+- `src/lib/modrinth.ts` — Modrinth Labrinth API 客户端（分批查询）
+- `src/stores/mods.ts` — Pinia store，串联扫描主流程
+- `src/components/mod/` — 业务组件（FolderPicker、ScanProgress、ModTable、ModCard、ModDetailSheet 等）
+- `src/types/mod.ts` — 类型定义
 
 ---
 

@@ -1,6 +1,6 @@
 {
   "common": {
-    "title": "Vue Project Template"
+    "title": "Modrinth Local Mod Manager"
   },
   "settings": {
     "title": "Settings",
@@ -17,6 +17,79 @@
         "en": "English",
         "zh": "Chinese (Simplified) - 简体中文"
       }
+    }
+  },
+  "mod": {
+    "pickFolder": "Pick Mods Folder",
+    "changeFolder": "Change Folder",
+    "rescan": "Rescan",
+    "cancel": "Cancel",
+    "folderSelected": "Folder selected: {name}",
+    "folderSelectFailed": "Failed to pick folder",
+    "needPermission": "Permission required to access the previously selected folder",
+    "emptyTitle": "No mods folder selected",
+    "emptyDesc": "Click the button below to pick your local Minecraft mods folder. The tool will scan all jar files and fetch metadata from Modrinth.",
+    "noJarsTitle": "No jar files found",
+    "noJarsDesc": "No .jar mod files were found in the selected folder. Please verify the path and try again.",
+    "unsupportedTitle": "Browser Not Supported",
+    "unsupportedDesc": "This tool requires the File System Access API. Please use a Chromium-based browser such as Chrome or Edge (version 86+).",
+    "notFoundDesc": "No matching Modrinth project was found. This may be a private mod or only published on CurseForge.",
+    "searchPlaceholder": "Search by name, author or filename…",
+    "noResults": "No matching mods",
+    "stage": {
+      "listing": "Listing jar files…",
+      "hashing": "Computing file hashes…",
+      "queryingVersions": "Querying Modrinth versions…",
+      "queryingProjects": "Querying Modrinth projects…",
+      "done": "Scan complete",
+      "error": "Scan failed"
+    },
+    "status": {
+      "pending": "Pending",
+      "hashing": "Hashing",
+      "querying": "Querying",
+      "matched": "Matched",
+      "not_found": "Not Found",
+      "error": "Error"
+    },
+    "filter": {
+      "all": "All",
+      "matched": "Matched",
+      "not_found": "Not Found",
+      "error": "Error"
+    },
+    "view": {
+      "table": "Table View",
+      "card": "Card View"
+    },
+    "col": {
+      "modName": "Mod Name",
+      "version": "Version",
+      "mcVersions": "MC Versions",
+      "loaders": "Loaders",
+      "author": "Author",
+      "downloads": "Downloads",
+      "status": "Status"
+    },
+    "statsTotal": "{n} files",
+    "statsMatched": "{n} matched",
+    "statsNotFound": "{n} not found",
+    "statsError": "{n} error",
+    "statsDownloads": "{n} total downloads",
+    "detail": {
+      "description": "Description",
+      "projectInfo": "Project Info",
+      "versionInfo": "Version Info",
+      "fileInfo": "File Info",
+      "author": "Author",
+      "downloads": "Downloads",
+      "follows": "Followers",
+      "updated": "Last Updated",
+      "published": "Published",
+      "filePath": "File Path",
+      "fileSize": "File Size",
+      "error": "Error",
+      "viewVersion": "View Version"
     }
   }
 }
