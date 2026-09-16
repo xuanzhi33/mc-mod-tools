@@ -106,7 +106,7 @@ function formatDateLocal(s?: string): string {
             </div>
             <div class="flex justify-between py-1">
               <dt class="text-muted-foreground">{{ t('mod.detail.follows') }}</dt>
-              <dd class="tabular-nums">{{ formatNumber(mod.project?.follows ?? 0) }}</dd>
+              <dd class="tabular-nums">{{ formatNumber(mod.project?.followers ?? 0) }}</dd>
             </div>
             <div class="flex justify-between py-1">
               <dt class="text-muted-foreground">{{ t('mod.detail.updated') }}</dt>

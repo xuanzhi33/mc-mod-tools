@@ -11,7 +11,7 @@ import {
   pickDirectory,
 } from '@/lib/fs'
 import { computeSha1 } from '@/lib/hash'
-import { fetchProjectsByIds, fetchVersionsByHashes } from '@/lib/modrinth'
+import { fetchProjectAuthors, fetchProjectsByIds, fetchVersionsByHashes } from '@/lib/modrinth'
 
 const HASH_CONCURRENCY = 4
 
@@ -27,7 +27,7 @@ async function runWithConcurrency<T>(
       const idx = cursor++
       const item = items[idx]
       if (item === undefined) continue
-       
+
       await worker(item, idx)
     }
   })
@@ -62,7 +62,7 @@ export const useModsStore = defineStore('mods', () => {
           m.path.toLowerCase().includes(q) ||
           (p?.title.toLowerCase().includes(q) ?? false) ||
           (p?.slug.toLowerCase().includes(q) ?? false) ||
-          (p?.author.toLowerCase().includes(q) ?? false) ||
+          (p?.author?.toLowerCase().includes(q) ?? false) ||
           (m.version?.version_number.toLowerCase().includes(q) ?? false)
         )
       })
@@ -75,10 +75,7 @@ export const useModsStore = defineStore('mods', () => {
     const matched = modFiles.value.filter((m) => m.status === 'matched').length
     const notFound = modFiles.value.filter((m) => m.status === 'not_found').length
     const error = modFiles.value.filter((m) => m.status === 'error').length
-    const totalDownloads = modFiles.value.reduce(
-      (sum, m) => sum + (m.project?.downloads ?? 0),
-      0,
-    )
+    const totalDownloads = modFiles.value.reduce((sum, m) => sum + (m.project?.downloads ?? 0), 0)
     return { total, matched, notFound, error, totalDownloads }
   })
 
@@ -250,6 +247,27 @@ export const useModsStore = defineStore('mods', () => {
         if (pid && projectMap[pid]) {
           m.project = projectMap[pid]
           m.status = 'matched'
+        }
+      }
+
+      if (cancelled) return
+
+      // 5. 批量查询作者（项目接口不返回 author，需走 search 接口）
+      const authorIds = [...matchedProjectIds]
+      if (authorIds.length > 0) {
+        progress.value = {
+          stage: 'querying-authors',
+          total: authorIds.length,
+          processed: 0,
+        }
+        const authorMap = await fetchProjectAuthors(authorIds, (done, total) => {
+          progress.value = { stage: 'querying-authors', total, processed: done }
+        })
+        for (const m of modFiles.value) {
+          const pid = m.version?.project_id
+          if (pid && m.project && authorMap[pid]) {
+            m.project.author = authorMap[pid]
+          }
         }
       }
 

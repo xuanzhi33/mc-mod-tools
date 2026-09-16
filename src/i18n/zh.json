@@ -49,6 +49,7 @@
       "hashing": "正在计算文件哈希…",
       "queryingVersions": "正在查询 Modrinth 版本信息…",
       "queryingProjects": "正在查询 Modrinth 项目详情…",
+      "queryingAuthors": "正在查询模组作者…",
       "done": "扫描完成",
       "error": "扫描出错"
     },

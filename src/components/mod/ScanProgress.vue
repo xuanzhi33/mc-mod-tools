@@ -48,6 +48,8 @@ const stageText = computed(() => {
       return t('mod.stage.queryingVersions')
     case 'querying-projects':
       return t('mod.stage.queryingProjects')
+    case 'querying-authors':
+      return t('mod.stage.queryingAuthors')
     case 'done':
       return t('mod.stage.done')
     case 'error':

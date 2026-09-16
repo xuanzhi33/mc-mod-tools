@@ -49,6 +49,7 @@
       "hashing": "Computing file hashes…",
       "queryingVersions": "Querying Modrinth versions…",
       "queryingProjects": "Querying Modrinth projects…",
+      "queryingAuthors": "Querying mod authors…",
       "done": "Scan complete",
       "error": "Scan failed"
     },

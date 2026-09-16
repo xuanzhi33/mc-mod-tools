@@ -10,7 +10,7 @@ export interface ModrinthProject {
   server_side: 'required' | 'optional' | 'unsupported'
   project_type: 'mod' | 'modpack' | 'resourcepack' | 'shader' | 'plugin' | 'datapack'
   downloads: number
-  follows: number
+  followers: number
   icon_url: string | null
   published: string
   updated: string
@@ -21,7 +21,8 @@ export interface ModrinthProject {
   color: number | null
   featured_gallery: string | null
   id: string
-  author: string
+  /** 作者用户名。项目接口不返回，需由 search 接口补充（见 fetchProjectAuthors） */
+  author?: string
 }
 
 export interface ModrinthFile {
@@ -86,7 +87,15 @@ export interface ModFile {
   error?: string
 }
 
-export type ScanStage = 'idle' | 'listing' | 'hashing' | 'querying-versions' | 'querying-projects' | 'done' | 'error'
+export type ScanStage =
+  | 'idle'
+  | 'listing'
+  | 'hashing'
+  | 'querying-versions'
+  | 'querying-projects'
+  | 'querying-authors'
+  | 'done'
+  | 'error'
 
 export interface ScanProgress {
   stage: ScanStage
