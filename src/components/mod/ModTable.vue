@@ -12,11 +12,11 @@ import {
 } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
 import { useModsStore } from '@/stores/mods'
-import { formatCompactNumber } from '@/lib/format'
+import { formatCompactNumber, formatDate } from '@/lib/format'
 import { isUnrecognized } from '@/lib/mod-status'
 import type { ModFile } from '@/types/mod'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const store = useModsStore()
 
 const emit = defineEmits<{ open: [m: ModFile] }>()
@@ -33,12 +33,6 @@ function onRowKeydown(e: KeyboardEvent, m: ModFile) {
 }
 
 const rows = computed(() => store.filteredFiles)
-
-const MAX_TAGS = 2
-
-function rest(list: string[] | undefined): number {
-  return Math.max(0, (list?.length ?? 0) - MAX_TAGS)
-}
 </script>
 
 <template>
@@ -51,9 +45,9 @@ function rest(list: string[] | undefined): number {
           <TableHead class="min-w-[220px]">{{ t('mod.col.modName') }}</TableHead>
           <TableHead class="min-w-[110px]">{{ t('mod.col.version') }}</TableHead>
           <TableHead>{{ t('mod.col.mcVersions') }}</TableHead>
-          <TableHead>{{ t('mod.col.loaders') }}</TableHead>
           <TableHead>{{ t('mod.col.author') }}</TableHead>
-          <TableHead class="text-right">{{ t('mod.col.downloads') }}</TableHead>
+          <TableHead>{{ t('mod.col.published') }}</TableHead>
+          <TableHead>{{ t('mod.col.downloads') }}</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody class="[&>tr:not(:last-child)>td]:border-b">
@@ -92,38 +86,24 @@ function rest(list: string[] | undefined): number {
           </TableCell>
           <TableCell>
             <div v-if="m.version?.game_versions?.length" class="flex flex-wrap gap-1">
+              <Badge variant="outline" class="font-mono text-[11px]">
+                {{ m.version.game_versions.at(-1) }}
+              </Badge>
               <Badge
-                v-for="gv in m.version.game_versions.slice(0, MAX_TAGS)"
-                :key="gv"
+                v-if="m.version.game_versions.length > 1"
                 variant="outline"
-                class="font-mono text-[11px]"
+                class="text-[11px]"
               >
-                {{ gv }}
-              </Badge>
-              <Badge v-if="rest(m.version.game_versions)" variant="outline" class="text-[11px]">
-                +{{ rest(m.version.game_versions) }}
-              </Badge>
-            </div>
-            <span v-else class="text-muted-foreground text-xs">—</span>
-          </TableCell>
-          <TableCell>
-            <div v-if="m.version?.loaders?.length" class="flex flex-wrap gap-1">
-              <Badge
-                v-for="ld in m.version.loaders.slice(0, MAX_TAGS)"
-                :key="ld"
-                variant="secondary"
-                class="font-mono text-[11px]"
-              >
-                {{ ld }}
-              </Badge>
-              <Badge v-if="rest(m.version.loaders)" variant="secondary" class="text-[11px]">
-                +{{ rest(m.version.loaders) }}
+                +{{ m.version.game_versions.length - 1 }}
               </Badge>
             </div>
             <span v-else class="text-muted-foreground text-xs">—</span>
           </TableCell>
           <TableCell class="text-sm">{{ m.project?.author ?? '—' }}</TableCell>
-          <TableCell class="text-right tabular-nums">
+          <TableCell class="text-muted-foreground text-xs whitespace-nowrap">
+            {{ formatDate(m.version?.date_published, locale) }}
+          </TableCell>
+          <TableCell class="tabular-nums">
             <span
               v-if="m.project"
               class="inline-flex items-center gap-1"

@@ -55,16 +55,13 @@
       "done": "Scan complete",
       "error": "Scan failed"
     },
-    "view": {
-      "table": "Table View",
-      "card": "Card View"
-    },
     "col": {
       "modName": "Mod Name",
       "version": "Version",
       "mcVersions": "MC Versions",
       "loaders": "Loaders",
       "author": "Author",
+      "published": "Published",
       "downloads": "Downloads"
     },
     "statsTotal": "{n} files",

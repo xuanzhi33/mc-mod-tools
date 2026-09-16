@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { LayoutGrid, List, Search, Settings, X } from 'lucide-vue-next'
+import { Search, Settings, X } from 'lucide-vue-next'
 import { toast } from 'vue-sonner'
 import { Button } from '@/components/ui/button'
-import { ButtonGroup } from '@/components/ui/button-group'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
@@ -12,7 +11,6 @@ import FolderPicker from '@/components/mod/FolderPicker.vue'
 import ScanProgress from '@/components/mod/ScanProgress.vue'
 import EmptyState from '@/components/mod/EmptyState.vue'
 import ModTable from '@/components/mod/ModTable.vue'
-import ModCard from '@/components/mod/ModCard.vue'
 import ModDetailSheet from '@/components/mod/ModDetailSheet.vue'
 import SettingsDialog from '@/components/mod/SettingsDialog.vue'
 import { useModsStore } from '@/stores/mods'
@@ -144,39 +142,6 @@ onMounted(async () => {
           >
             {{ t('mod.statsProblem', { n: store.stats.problem }) }}
           </Badge>
-
-          <TooltipProvider :delay-duration="300">
-            <ButtonGroup class="ml-auto">
-              <Tooltip>
-                <TooltipTrigger as-child>
-                  <Button
-                    :variant="store.viewMode === 'table' ? 'secondary' : 'ghost'"
-                    size="icon-sm"
-                    :aria-label="t('mod.view.table')"
-                    :aria-pressed="store.viewMode === 'table'"
-                    @click="store.viewMode = 'table'"
-                  >
-                    <List />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>{{ t('mod.view.table') }}</TooltipContent>
-              </Tooltip>
-              <Tooltip>
-                <TooltipTrigger as-child>
-                  <Button
-                    :variant="store.viewMode === 'card' ? 'secondary' : 'ghost'"
-                    size="icon-sm"
-                    :aria-label="t('mod.view.card')"
-                    :aria-pressed="store.viewMode === 'card'"
-                    @click="store.viewMode = 'card'"
-                  >
-                    <LayoutGrid />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>{{ t('mod.view.card') }}</TooltipContent>
-              </Tooltip>
-            </ButtonGroup>
-          </TooltipProvider>
         </div>
       </div>
     </header>
@@ -193,13 +158,7 @@ onMounted(async () => {
           <ScanProgress class="mb-4" />
 
           <EmptyState v-if="showEmpty" @pick="onPickFromEmpty" />
-
-          <div v-else class="space-y-4">
-            <ModTable v-if="store.viewMode === 'table'" @open="openDetail" />
-            <div v-else class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              <ModCard v-for="m in store.filteredFiles" :key="m.path" :mod="m" @open="openDetail" />
-            </div>
-          </div>
+          <ModTable v-else @open="openDetail" />
         </template>
       </div>
     </main>

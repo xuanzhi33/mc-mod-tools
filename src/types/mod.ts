@@ -103,5 +103,3 @@ export interface ScanProgress {
   processed: number
   message?: string
 }
-
-export type ViewMode = 'table' | 'card'

@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { computed, ref, shallowRef } from 'vue'
-import type { ModFile, ScanProgress, ViewMode } from '@/types/mod'
+import type { ModFile, ScanProgress } from '@/types/mod'
 import {
   clearSavedHandle,
   ensurePermission,
@@ -44,7 +44,6 @@ export const useModsStore = defineStore('mods', () => {
   const modFiles = ref<ModFile[]>([])
   const progress = ref<ScanProgress>({ stage: 'idle', total: 0, processed: 0 })
   const scanning = ref(false)
-  const viewMode = ref<ViewMode>('table')
   const search = ref('')
 
   const filteredFiles = computed<ModFile[]>(() => {
@@ -295,7 +294,6 @@ export const useModsStore = defineStore('mods', () => {
     modFiles,
     progress,
     scanning,
-    viewMode,
     search,
     // computed
     filteredFiles,
