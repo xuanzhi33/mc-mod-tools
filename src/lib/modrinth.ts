@@ -13,7 +13,10 @@ const HEADERS: HeadersInit = {
   'Content-Type': 'application/json',
 }
 
-const VERSION_FILES_BATCH = 10 // 单次 POST /version_files 最多 10 个 hash
+// 单次 POST /version_files 的 hash 数。
+// 服务端（Labrinth v3 FileHashes）无数量校验，仅受 JSON body ≤ 2MB 限制
+// （实测约 4.8 万个 sha1），这里与 projects/authors 统一取 100。
+const VERSION_FILES_BATCH = 100
 const PROJECTS_BATCH = 100 // 单次 GET /projects?ids=[] 最多 100 个 id
 const SEARCH_BATCH = 100 // 单次 GET /search 的 facet / limit 上限
 
