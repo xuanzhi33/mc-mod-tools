@@ -6,6 +6,8 @@ import { useModsStore } from '@/stores/mods'
 
 const { t } = useI18n()
 const store = useModsStore()
+
+defineEmits<{ pick: [] }>()
 </script>
 
 <template>
@@ -43,6 +45,10 @@ const store = useModsStore()
         <p class="text-lg font-medium">{{ t('mod.noJarsTitle') }}</p>
         <p class="text-muted-foreground max-w-md text-sm">{{ t('mod.noJarsDesc') }}</p>
       </div>
+      <Button variant="outline" @click="$emit('pick')">
+        <FolderOpen />
+        {{ t('mod.changeFolder') }}
+      </Button>
     </template>
   </div>
 </template>

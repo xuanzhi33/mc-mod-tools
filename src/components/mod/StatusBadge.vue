@@ -8,9 +8,7 @@ const props = defineProps<{ status: ModFileStatus }>()
 
 const { t } = useI18n()
 
-const variant = computed<
-  'default' | 'secondary' | 'destructive' | 'outline'
->(() => {
+const variant = computed<'default' | 'secondary' | 'destructive' | 'outline'>(() => {
   switch (props.status) {
     case 'matched':
       return 'default'
@@ -29,5 +27,5 @@ const label = computed(() => t(`mod.status.${props.status}`))
 </script>
 
 <template>
-  <Badge :variant="variant" class="font-mono">{{ label }}</Badge>
+  <Badge :variant="variant" class="whitespace-nowrap">{{ label }}</Badge>
 </template>

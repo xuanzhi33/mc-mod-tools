@@ -22,6 +22,13 @@
   "mod": {
     "pickFolder": "Pick Mods Folder",
     "changeFolder": "Change Folder",
+    "clearFolder": "Clear and forget folder",
+    "clearDialog": {
+      "title": "Clear the current folder?",
+      "desc": "Scanned results will be removed and the saved folder permission will be forgotten. You will need to pick the folder again next time.",
+      "confirm": "Clear",
+      "done": "Folder record cleared"
+    },
     "rescan": "Rescan",
     "cancel": "Cancel",
     "folderSelected": "Folder selected: {name}",
@@ -35,6 +42,7 @@
     "unsupportedDesc": "This tool requires the File System Access API. Please use a Chromium-based browser such as Chrome or Edge (version 86+).",
     "notFoundDesc": "No matching Modrinth project was found. This may be a private mod or only published on CurseForge.",
     "searchPlaceholder": "Search by name, author or filename…",
+    "searchClear": "Clear search",
     "noResults": "No matching mods",
     "stage": {
       "listing": "Listing jar files…",
@@ -76,6 +84,7 @@
     "statsNotFound": "{n} not found",
     "statsError": "{n} error",
     "statsDownloads": "{n} total downloads",
+    "statsShowing": "Showing {shown} of {total}",
     "detail": {
       "description": "Description",
       "projectInfo": "Project Info",

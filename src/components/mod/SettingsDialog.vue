@@ -39,7 +39,7 @@ const localeOptions = computed(() =>
   })),
 )
 
-const sectionTitleClass = 'font-semibold text-muted-foreground border-b pt-3 pb-2'
+const sectionTitleClass = 'font-semibold text-muted-foreground border-b pb-2'
 </script>
 
 <template>
@@ -55,27 +55,29 @@ const sectionTitleClass = 'font-semibold text-muted-foreground border-b pt-3 pb-
         </DialogDescription>
       </DialogHeader>
 
-      <div class="space-y-3">
-        <h2 :class="sectionTitleClass" class="flex items-center">
-          <AppWindow class="mr-2 size-4" />
-          {{ t('settings.interface.title') }}
-        </h2>
+      <div class="space-y-6">
+        <section class="space-y-3">
+          <h2 :class="sectionTitleClass" class="flex items-center gap-2">
+            <AppWindow class="size-4" />
+            {{ t('settings.interface.title') }}
+          </h2>
 
-        <SettingsItem
-          v-model="colorMode"
-          :label="t('settings.interface.colorMode')"
-          type="select"
-          :icon="SunMoon"
-          :options="colorOptions"
-        />
+          <SettingsItem
+            v-model="colorMode"
+            :label="t('settings.interface.colorMode')"
+            type="select"
+            :icon="SunMoon"
+            :options="colorOptions"
+          />
 
-        <SettingsItem
-          v-model="language"
-          :label="t('settings.interface.language')"
-          type="select"
-          :icon="Languages"
-          :options="localeOptions"
-        />
+          <SettingsItem
+            v-model="language"
+            :label="t('settings.interface.language')"
+            type="select"
+            :icon="Languages"
+            :options="localeOptions"
+          />
+        </section>
       </div>
     </DialogContent>
   </Dialog>

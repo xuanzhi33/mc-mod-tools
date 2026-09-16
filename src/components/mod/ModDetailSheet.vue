@@ -4,7 +4,6 @@ import { useI18n } from 'vue-i18n'
 import { Download, ExternalLink, FileText, Hash, User } from 'lucide-vue-next'
 import {
   Sheet,
-  SheetClose,
   SheetContent,
   SheetDescription,
   SheetHeader,
@@ -14,12 +13,13 @@ import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import { Button } from '@/components/ui/button'
 import StatusBadge from './StatusBadge.vue'
+import { formatBytes, formatDate, formatNumber } from '@/lib/format'
 import type { ModFile } from '@/types/mod'
 
 const props = defineProps<{ modelValue: boolean; mod: ModFile | null }>()
 const emit = defineEmits<{ 'update:modelValue': [v: boolean] }>()
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 
 const open = computed({
   get: () => props.modelValue,
@@ -36,40 +36,23 @@ const versionUrl = computed(() => {
   return `https://modrinth.com/project/${props.mod.project?.slug ?? ''}/version/${props.mod.version.id}`
 })
 
-function formatNumber(n: number): string {
-  return n.toLocaleString()
-}
-
-function formatDate(s?: string): string {
-  if (!s) return '—'
-  return new Date(s).toLocaleString()
-}
-
-function formatBytes(n: number): string {
-  if (n < 1024) return `${n} B`
-  if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)} KB`
-  return `${(n / 1024 / 1024).toFixed(2)} MB`
+function formatDateLocal(s?: string): string {
+  return formatDate(s, locale.value)
 }
 </script>
 
 <template>
   <Sheet v-model:open="open">
-    <SheetContent
-      side="right"
-      class="w-full gap-0 sm:max-w-md overflow-y-auto"
-    >
-      <SheetHeader class="space-y-2">
+    <SheetContent side="right" class="flex w-full flex-col gap-0 p-0 sm:max-w-md">
+      <SheetHeader class="shrink-0 gap-2 space-y-0 border-b p-4 pr-12">
         <div class="flex items-start gap-3">
           <img
             v-if="mod?.project?.icon_url"
             :src="mod.project.icon_url"
             :alt="mod.project.title"
-            class="size-12 rounded object-cover"
+            class="bg-muted size-12 shrink-0 rounded object-cover"
           />
-          <div
-            v-else
-            class="bg-muted flex size-12 items-center justify-center rounded"
-          >
+          <div v-else class="bg-muted flex size-12 shrink-0 items-center justify-center rounded">
             <FileText class="text-muted-foreground size-6" />
           </div>
           <div class="min-w-0 flex-1">
@@ -80,7 +63,6 @@ function formatBytes(n: number): string {
               {{ mod?.project?.slug ?? mod?.name }}
             </SheetDescription>
           </div>
-          <SheetClose />
         </div>
         <div v-if="mod" class="flex flex-wrap items-center gap-1.5">
           <StatusBadge :status="mod.status" />
@@ -93,10 +75,10 @@ function formatBytes(n: number): string {
         </div>
       </SheetHeader>
 
-      <div v-if="mod" class="space-y-4 px-4 pb-6">
+      <div v-if="mod" class="min-h-0 flex-1 space-y-4 overflow-y-auto p-4">
         <!-- 描述 -->
         <section v-if="mod.project?.description" class="space-y-1">
-          <h4 class="text-muted-foreground text-xs uppercase tracking-wide">
+          <h4 class="text-muted-foreground text-xs tracking-wide uppercase">
             {{ t('mod.detail.description') }}
           </h4>
           <p class="text-sm leading-relaxed">{{ mod.project.description }}</p>
@@ -104,7 +86,7 @@ function formatBytes(n: number): string {
 
         <!-- 项目信息 -->
         <section class="space-y-2">
-          <h4 class="text-muted-foreground text-xs uppercase tracking-wide">
+          <h4 class="text-muted-foreground text-xs tracking-wide uppercase">
             {{ t('mod.detail.projectInfo') }}
           </h4>
           <dl class="text-sm">
@@ -128,7 +110,7 @@ function formatBytes(n: number): string {
             </div>
             <div class="flex justify-between py-1">
               <dt class="text-muted-foreground">{{ t('mod.detail.updated') }}</dt>
-              <dd>{{ formatDate(mod.project?.updated) }}</dd>
+              <dd>{{ formatDateLocal(mod.project?.updated) }}</dd>
             </div>
           </dl>
         </section>
@@ -137,7 +119,7 @@ function formatBytes(n: number): string {
 
         <!-- 版本信息 -->
         <section class="space-y-2">
-          <h4 class="text-muted-foreground text-xs uppercase tracking-wide">
+          <h4 class="text-muted-foreground text-xs tracking-wide uppercase">
             {{ t('mod.detail.versionInfo') }}
           </h4>
           <dl class="text-sm">
@@ -171,7 +153,7 @@ function formatBytes(n: number): string {
             </div>
             <div class="flex justify-between py-1">
               <dt class="text-muted-foreground">{{ t('mod.detail.published') }}</dt>
-              <dd>{{ formatDate(mod.version?.date_published) }}</dd>
+              <dd>{{ formatDateLocal(mod.version?.date_published) }}</dd>
             </div>
           </dl>
         </section>
@@ -180,13 +162,13 @@ function formatBytes(n: number): string {
 
         <!-- 文件信息 -->
         <section class="space-y-2">
-          <h4 class="text-muted-foreground text-xs uppercase tracking-wide">
+          <h4 class="text-muted-foreground text-xs tracking-wide uppercase">
             {{ t('mod.detail.fileInfo') }}
           </h4>
           <dl class="text-sm">
             <div class="py-1">
               <dt class="text-muted-foreground">{{ t('mod.detail.filePath') }}</dt>
-              <dd class="break-all font-mono text-xs">{{ mod.path }}</dd>
+              <dd class="font-mono text-xs break-all">{{ mod.path }}</dd>
             </div>
             <div class="flex justify-between py-1">
               <dt class="text-muted-foreground">{{ t('mod.detail.fileSize') }}</dt>
@@ -203,7 +185,7 @@ function formatBytes(n: number): string {
 
         <!-- 错误信息 -->
         <section v-if="mod.error" class="space-y-1">
-          <h4 class="text-destructive text-xs uppercase tracking-wide">
+          <h4 class="text-destructive text-xs tracking-wide uppercase">
             {{ t('mod.detail.error') }}
           </h4>
           <p class="text-destructive text-xs">{{ mod.error }}</p>

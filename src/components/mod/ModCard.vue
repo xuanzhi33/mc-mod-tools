@@ -2,13 +2,10 @@
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Download, ExternalLink } from 'lucide-vue-next'
-import {
-  Card,
-  CardContent,
-  CardHeader,
-} from '@/components/ui/card'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import StatusBadge from './StatusBadge.vue'
+import { formatCompactNumber } from '@/lib/format'
 import type { ModFile } from '@/types/mod'
 
 const props = defineProps<{ mod: ModFile }>()
@@ -21,24 +18,28 @@ const projectUrl = computed(() => {
   return `https://modrinth.com/project/${props.mod.project.slug}`
 })
 
-function formatNumber(n: number): string {
-  if (n >= 1_000_000) return (n / 1_000_000).toFixed(1) + 'M'
-  if (n >= 1_000) return (n / 1_000).toFixed(1) + 'K'
-  return String(n)
+function onKeydown(e: KeyboardEvent) {
+  if (e.key === 'Enter' || e.key === ' ') {
+    e.preventDefault()
+    emit('open', props.mod)
+  }
 }
 </script>
 
 <template>
   <Card
-    class="cursor-pointer transition-shadow hover:shadow-md"
+    role="button"
+    tabindex="0"
+    class="cursor-pointer transition-shadow hover:shadow-md focus-visible:ring-ring outline-none focus-visible:ring-2"
     @click="emit('open', mod)"
+    @keydown="onKeydown"
   >
     <CardHeader class="flex-row items-start gap-3 space-y-0">
       <img
         v-if="mod.project?.icon_url"
         :src="mod.project.icon_url"
         :alt="mod.project.title"
-        class="size-10 rounded object-cover"
+        class="bg-muted size-10 shrink-0 rounded object-cover"
         loading="lazy"
       />
       <div
@@ -67,25 +68,17 @@ function formatNumber(n: number): string {
         <Badge v-if="mod.version" variant="secondary" class="font-mono">
           {{ mod.version.version_number }}
         </Badge>
-        <Badge
-          v-for="gv in mod.version?.game_versions.slice(0, 3)"
-          :key="gv"
-          variant="outline"
-        >
+        <Badge v-for="gv in mod.version?.game_versions.slice(0, 3)" :key="gv" variant="outline">
           {{ gv }}
         </Badge>
-        <Badge
-          v-for="ld in mod.version?.loaders.slice(0, 3)"
-          :key="ld"
-          variant="outline"
-        >
+        <Badge v-for="ld in mod.version?.loaders.slice(0, 3)" :key="ld" variant="outline">
           {{ ld }}
         </Badge>
       </div>
       <div class="flex items-center justify-between pt-1">
         <span v-if="mod.project" class="text-muted-foreground inline-flex items-center gap-1">
           <Download class="size-3" />
-          {{ formatNumber(mod.project.downloads) }}
+          {{ formatCompactNumber(mod.project.downloads) }}
         </span>
         <a
           v-if="projectUrl"

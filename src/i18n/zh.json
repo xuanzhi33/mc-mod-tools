@@ -22,6 +22,13 @@
   "mod": {
     "pickFolder": "选择模组文件夹",
     "changeFolder": "更换文件夹",
+    "clearFolder": "清除并忘记该文件夹",
+    "clearDialog": {
+      "title": "清除当前文件夹？",
+      "desc": "将移除已扫描的结果，并忘记已保存的文件夹授权，下次需要重新选择。",
+      "confirm": "清除",
+      "done": "已清除文件夹记录"
+    },
     "rescan": "重新扫描",
     "cancel": "取消",
     "folderSelected": "已选择文件夹：{name}",
@@ -35,6 +42,7 @@
     "unsupportedDesc": "本工具依赖 File System Access API，请使用 Chrome、Edge 或其他基于 Chromium 的浏览器（需 ≥86 版本）。",
     "notFoundDesc": "该文件未在 Modrinth 找到对应项目，可能是本地私有模组或仅发布在 CurseForge。",
     "searchPlaceholder": "搜索模组名、作者或文件名…",
+    "searchClear": "清除搜索",
     "noResults": "没有匹配的模组",
     "stage": {
       "listing": "正在列出 jar 文件…",
@@ -76,6 +84,7 @@
     "statsNotFound": "未识别 {n}",
     "statsError": "错误 {n}",
     "statsDownloads": "累计下载 {n}",
+    "statsShowing": "筛选后 {shown} / 共 {total}",
     "detail": {
       "description": "描述",
       "projectInfo": "项目信息",

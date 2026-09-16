@@ -1,12 +1,36 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { CheckCircle2 } from 'lucide-vue-next'
 import { Progress } from '@/components/ui/progress'
 import { Button } from '@/components/ui/button'
 import { useModsStore } from '@/stores/mods'
 
 const { t } = useI18n()
 const store = useModsStore()
+
+const DONE_VISIBLE_MS = 3000
+const showDone = ref(false)
+let doneTimer: number | undefined
+
+watch(
+  () => store.progress.stage,
+  (stage) => {
+    window.clearTimeout(doneTimer)
+    if (stage === 'done') {
+      showDone.value = true
+      doneTimer = window.setTimeout(() => {
+        showDone.value = false
+      }, DONE_VISIBLE_MS)
+    } else {
+      showDone.value = false
+    }
+  },
+)
+
+onBeforeUnmount(() => window.clearTimeout(doneTimer))
+
+const visible = computed(() => store.scanning || store.progress.stage === 'error' || showDone.value)
 
 const percent = computed(() => {
   const { total, processed } = store.progress
@@ -35,10 +59,16 @@ const stageText = computed(() => {
 </script>
 
 <template>
-  <div v-if="store.scanning || store.progress.stage === 'error'" class="space-y-2">
+  <div v-if="visible" class="space-y-2">
     <div class="flex items-center justify-between gap-2 text-sm">
-      <span class="text-muted-foreground">{{ stageText }}</span>
-      <span class="tabular-nums text-muted-foreground">
+      <span
+        class="inline-flex items-center gap-1.5"
+        :class="store.progress.stage === 'done' ? 'text-primary' : 'text-muted-foreground'"
+      >
+        <CheckCircle2 v-if="store.progress.stage === 'done'" class="size-4" />
+        {{ stageText }}
+      </span>
+      <span v-if="store.progress.stage !== 'done'" class="text-muted-foreground tabular-nums">
         {{ store.progress.processed }} / {{ store.progress.total }}
       </span>
     </div>
