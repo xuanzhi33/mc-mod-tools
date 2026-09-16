@@ -124,9 +124,17 @@ function rest(list: string[] | undefined): number {
           </TableCell>
           <TableCell class="text-sm">{{ m.project?.author ?? '—' }}</TableCell>
           <TableCell class="text-right tabular-nums">
-            <span v-if="m.project" class="inline-flex items-center gap-1">
-              <Download class="size-3" />
-              {{ formatCompactNumber(m.project.downloads) }}
+            <span
+              v-if="m.project"
+              class="inline-flex items-center gap-1"
+              :title="t('mod.downloadsHint')"
+            >
+              <Download class="size-3 shrink-0" />
+              <span v-if="m.version">{{ formatCompactNumber(m.version.downloads) }}</span>
+              <span>/</span>
+              <span class="text-muted-foreground">
+                {{ formatCompactNumber(m.project.downloads) }}
+              </span>
             </span>
             <span v-else>—</span>
           </TableCell>

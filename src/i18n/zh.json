@@ -44,6 +44,7 @@
     "notFoundDesc": "该文件未在 Modrinth 找到对应项目，可能是本地私有模组或仅发布在 CurseForge。",
     "searchPlaceholder": "搜索模组名、作者或文件名…",
     "searchClear": "清除搜索",
+    "downloadsHint": "本版本下载量 / 项目总下载量",
     "noResults": "没有匹配的模组",
     "stage": {
       "listing": "正在列出 jar 文件…",

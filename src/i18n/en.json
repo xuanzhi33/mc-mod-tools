@@ -44,6 +44,7 @@
     "notFoundDesc": "No matching Modrinth project was found. This may be a private mod or only published on CurseForge.",
     "searchPlaceholder": "Search by name, author or filename…",
     "searchClear": "Clear search",
+    "downloadsHint": "Version downloads / Project total",
     "noResults": "No matching mods",
     "stage": {
       "listing": "Listing jar files…",

@@ -98,8 +98,12 @@ function formatDateLocal(s?: string): string {
               <dt class="text-muted-foreground inline-flex items-center gap-1">
                 <Download class="size-3" />{{ t('mod.detail.downloads') }}
               </dt>
-              <dd class="tabular-nums">
-                {{ formatNumber(mod.project?.downloads ?? 0) }}
+              <dd class="flex items-center gap-1 tabular-nums" :title="t('mod.downloadsHint')">
+                <span>{{ formatNumber(mod.version?.downloads ?? 0) }}</span>
+                <span>/</span>
+                <span class="text-muted-foreground">
+                  {{ formatNumber(mod.project?.downloads ?? 0) }}
+                </span>
               </dd>
             </div>
             <div class="flex justify-between py-1">

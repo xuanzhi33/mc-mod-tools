@@ -74,9 +74,17 @@ function onKeydown(e: KeyboardEvent) {
         </Badge>
       </div>
       <div class="flex items-center justify-between pt-1">
-        <span v-if="mod.project" class="text-muted-foreground inline-flex items-center gap-1">
-          <Download class="size-3" />
-          {{ formatCompactNumber(mod.project.downloads) }}
+        <span
+          v-if="mod.project"
+          class="inline-flex items-center gap-1"
+          :title="t('mod.downloadsHint')"
+        >
+          <Download class="text-muted-foreground size-3 shrink-0" />
+          <span v-if="mod.version">{{ formatCompactNumber(mod.version.downloads) }}</span>
+          <span>/</span>
+          <span class="text-muted-foreground">
+            {{ formatCompactNumber(mod.project.downloads) }}
+          </span>
         </span>
         <a
           v-if="projectUrl"
