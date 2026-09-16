@@ -43,7 +43,7 @@ function rest(list: string[] | undefined): number {
 
 <template>
   <div class="rounded-md border">
-    <Table container-class="md:overflow-visible">
+    <Table class="border-separate border-spacing-0" container-class="md:overflow-visible">
       <TableHeader
         class="[&_th]:bg-background [&_th]:sticky [&_th]:top-0 [&_th]:z-10 [&_th]:border-b [&_tr]:border-b-0"
       >
@@ -57,7 +57,7 @@ function rest(list: string[] | undefined): number {
           <TableHead>{{ t('mod.col.status') }}</TableHead>
         </TableRow>
       </TableHeader>
-      <TableBody>
+      <TableBody class="[&>tr:not(:last-child)>td]:border-b">
         <TableRow
           v-for="m in rows"
           :key="m.path"

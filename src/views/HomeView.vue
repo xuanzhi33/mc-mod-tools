@@ -211,21 +211,23 @@ onMounted(async () => {
     </header>
 
     <!-- 主内容 -->
-    <main class="mx-auto w-full max-w-7xl flex-1 space-y-4 overflow-auto px-4 py-4">
-      <ScanProgress />
+    <main class="mx-auto w-full max-w-7xl flex-1 overflow-auto px-4">
+      <div class="space-y-4 py-4">
+        <ScanProgress />
 
-      <div v-if="showSkeleton" class="space-y-2">
-        <Skeleton v-for="i in 8" :key="i" class="h-10 w-full" />
-      </div>
-
-      <EmptyState v-else-if="showEmpty" @pick="onPickFromEmpty" />
-
-      <template v-else>
-        <ModTable v-if="store.viewMode === 'table'" @open="openDetail" />
-        <div v-else class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          <ModCard v-for="m in store.filteredFiles" :key="m.path" :mod="m" @open="openDetail" />
+        <div v-if="showSkeleton" class="space-y-2">
+          <Skeleton v-for="i in 8" :key="i" class="h-10 w-full" />
         </div>
-      </template>
+
+        <EmptyState v-else-if="showEmpty" @pick="onPickFromEmpty" />
+
+        <template v-else>
+          <ModTable v-if="store.viewMode === 'table'" @open="openDetail" />
+          <div v-else class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            <ModCard v-for="m in store.filteredFiles" :key="m.path" :mod="m" @open="openDetail" />
+          </div>
+        </template>
+      </div>
     </main>
 
     <ModDetailSheet v-model="detailOpen" :mod="selectedMod" />
