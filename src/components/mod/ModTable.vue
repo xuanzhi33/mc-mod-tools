@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
 import { useModsStore } from '@/stores/mods'
-import { formatCompactNumber, formatDate } from '@/lib/format'
+import { formatBytes, formatCompactNumber, formatDate, isWithinDays } from '@/lib/format'
 import { isUnrecognized } from '@/lib/mod-status'
 import type { ModFile } from '@/types/mod'
 
@@ -44,6 +44,7 @@ const rows = computed(() => store.filteredFiles)
         <TableRow>
           <TableHead class="min-w-[220px]">{{ t('mod.col.modName') }}</TableHead>
           <TableHead class="min-w-[110px]">{{ t('mod.col.version') }}</TableHead>
+          <TableHead>{{ t('mod.col.size') }}</TableHead>
           <TableHead>{{ t('mod.col.mcVersions') }}</TableHead>
           <TableHead>{{ t('mod.col.author') }}</TableHead>
           <TableHead>{{ t('mod.col.published') }}</TableHead>
@@ -84,6 +85,9 @@ const rows = computed(() => store.filteredFiles)
           <TableCell class="font-mono text-xs">
             {{ m.version?.version_number ?? '—' }}
           </TableCell>
+          <TableCell class="text-muted-foreground text-xs tabular-nums whitespace-nowrap">
+            {{ formatBytes(m.size) }}
+          </TableCell>
           <TableCell>
             <div v-if="m.version?.game_versions?.length" class="flex flex-wrap gap-1">
               <Badge variant="outline" class="font-mono text-[11px]">
@@ -100,7 +104,14 @@ const rows = computed(() => store.filteredFiles)
             <span v-else class="text-muted-foreground text-xs">—</span>
           </TableCell>
           <TableCell class="text-sm">{{ m.project?.author ?? '—' }}</TableCell>
-          <TableCell class="text-muted-foreground text-xs whitespace-nowrap">
+          <TableCell
+            class="text-xs whitespace-nowrap"
+            :class="
+              isWithinDays(m.version?.date_published, 3)
+                ? 'text-orange-500'
+                : 'text-muted-foreground'
+            "
+          >
             {{ formatDate(m.version?.date_published, locale) }}
           </TableCell>
           <TableCell class="tabular-nums">
@@ -110,7 +121,9 @@ const rows = computed(() => store.filteredFiles)
               :title="t('mod.downloadsHint')"
             >
               <Download class="size-3 shrink-0" />
-              <span v-if="m.version">{{ formatCompactNumber(m.version.downloads) }}</span>
+              <span v-if="m.version" :class="m.version.downloads < 100000 && 'text-orange-500'">
+                {{ formatCompactNumber(m.version.downloads) }}
+              </span>
               <span>/</span>
               <span class="text-muted-foreground">
                 {{ formatCompactNumber(m.project.downloads) }}
@@ -120,7 +133,7 @@ const rows = computed(() => store.filteredFiles)
           </TableCell>
         </TableRow>
         <TableRow v-if="rows.length === 0" class="hover:bg-transparent">
-          <TableCell :colspan="6" class="text-muted-foreground py-8 text-center">
+          <TableCell :colspan="7" class="text-muted-foreground py-8 text-center">
             {{ t('mod.noResults') }}
           </TableCell>
         </TableRow>

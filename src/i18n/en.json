@@ -58,6 +58,7 @@
     "col": {
       "modName": "Mod Name",
       "version": "Version",
+      "size": "Size",
       "mcVersions": "MC Versions",
       "loaders": "Loaders",
       "author": "Author",

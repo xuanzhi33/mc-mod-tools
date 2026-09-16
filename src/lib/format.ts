@@ -36,3 +36,11 @@ export function formatDate(s: string | undefined, locale?: string): string {
     day: 'numeric',
   })
 }
+
+/** 给定时间是否在最近 days 天内（用于高亮新发布的版本） */
+export function isWithinDays(s: string | undefined, days: number, now = Date.now()): boolean {
+  if (!s) return false
+  const t = new Date(s).getTime()
+  if (Number.isNaN(t)) return false
+  return now - t < days * 24 * 60 * 60 * 1000
+}
