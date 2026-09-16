@@ -20,6 +20,7 @@
     }
   },
   "mod": {
+    "scanning": "正在扫描…",
     "pickFolder": "选择模组文件夹",
     "changeFolder": "更换文件夹",
     "clearFolder": "清除并忘记该文件夹",

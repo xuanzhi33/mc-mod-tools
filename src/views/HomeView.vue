@@ -7,7 +7,6 @@ import { Button } from '@/components/ui/button'
 import { ButtonGroup } from '@/components/ui/button-group'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
-import { Skeleton } from '@/components/ui/skeleton'
 import {
   Select,
   SelectContent,
@@ -34,8 +33,6 @@ const detailOpen = ref(false)
 const settingsOpen = ref(false)
 
 const hasData = computed(() => !!store.dirHandle && store.modFiles.length > 0)
-
-const showSkeleton = computed(() => store.scanning && store.modFiles.length === 0)
 
 const isFiltering = computed(() => store.statusFilter !== 'all' || store.search.trim() !== '')
 
@@ -211,20 +208,23 @@ onMounted(async () => {
     </header>
 
     <!-- 主内容 -->
-    <main class="mx-auto w-full max-w-7xl flex-1 overflow-auto px-4">
-      <div class="space-y-4 py-4">
-        <ScanProgress />
-
-        <div v-if="showSkeleton" class="space-y-2">
-          <Skeleton v-for="i in 8" :key="i" class="h-10 w-full" />
-        </div>
-
-        <EmptyState v-else-if="showEmpty" @pick="onPickFromEmpty" />
+    <main class="mx-auto flex w-full max-w-7xl flex-1 flex-col overflow-auto px-4">
+      <div class="flex flex-1 flex-col py-4">
+        <!-- 扫描中：隐藏列表内容，把空间让给加载面板 -->
+        <template v-if="store.scanning">
+          <ScanProgress class="my-auto" />
+        </template>
 
         <template v-else>
-          <ModTable v-if="store.viewMode === 'table'" @open="openDetail" />
-          <div v-else class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            <ModCard v-for="m in store.filteredFiles" :key="m.path" :mod="m" @open="openDetail" />
+          <ScanProgress class="mb-4" />
+
+          <EmptyState v-if="showEmpty" @pick="onPickFromEmpty" />
+
+          <div v-else class="space-y-4">
+            <ModTable v-if="store.viewMode === 'table'" @open="openDetail" />
+            <div v-else class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              <ModCard v-for="m in store.filteredFiles" :key="m.path" :mod="m" @open="openDetail" />
+            </div>
           </div>
         </template>
       </div>

@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { CheckCircle2 } from 'lucide-vue-next'
-import { Progress } from '@/components/ui/progress'
+import { Check, Circle, Loader2, TriangleAlert } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
+import { Progress } from '@/components/ui/progress'
 import { useModsStore } from '@/stores/mods'
+import { SCAN_STAGES, overallPercent, type ScanStep } from '@/lib/progress'
 
 const { t } = useI18n()
 const store = useModsStore()
@@ -32,14 +33,17 @@ onBeforeUnmount(() => window.clearTimeout(doneTimer))
 
 const visible = computed(() => store.scanning || store.progress.stage === 'error' || showDone.value)
 
-const percent = computed(() => {
+const percent = computed(() => overallPercent(store.progress))
+
+const currentIndex = computed(() => SCAN_STAGES.indexOf(store.progress.stage as ScanStep))
+
+const detail = computed(() => {
   const { total, processed } = store.progress
-  if (total === 0) return 0
-  return Math.round((processed / total) * 100)
+  return total > 0 ? `${processed} / ${total}` : ''
 })
 
-const stageText = computed(() => {
-  switch (store.progress.stage) {
+function stageLabel(stage: ScanStep): string {
+  switch (stage) {
     case 'listing':
       return t('mod.stage.listing')
     case 'hashing':
@@ -50,38 +54,72 @@ const stageText = computed(() => {
       return t('mod.stage.queryingProjects')
     case 'querying-authors':
       return t('mod.stage.queryingAuthors')
-    case 'done':
-      return t('mod.stage.done')
-    case 'error':
-      return t('mod.stage.error')
-    default:
-      return ''
   }
-})
+}
 </script>
 
 <template>
-  <div v-if="visible" class="space-y-2">
-    <div class="flex items-center justify-between gap-2 text-sm">
-      <span
-        class="inline-flex items-center gap-1.5"
-        :class="store.progress.stage === 'done' ? 'text-primary' : 'text-muted-foreground'"
-      >
-        <CheckCircle2 v-if="store.progress.stage === 'done'" class="size-4" />
-        {{ stageText }}
-      </span>
-      <span v-if="store.progress.stage !== 'done'" class="text-muted-foreground tabular-nums">
-        {{ store.progress.processed }} / {{ store.progress.total }}
-      </span>
+  <div v-if="visible">
+    <!-- 扫描中：完整加载面板 -->
+    <div
+      v-if="store.scanning"
+      class="bg-card mx-auto w-full max-w-xl space-y-4 rounded-lg border p-5 shadow-sm"
+    >
+      <div class="flex items-center gap-2 font-medium">
+        <Loader2 class="text-primary size-4 animate-spin" />
+        {{ t('mod.scanning') }}
+      </div>
+
+      <ol class="space-y-2 text-sm">
+        <li
+          v-for="(stage, i) in SCAN_STAGES"
+          :key="stage"
+          class="flex items-center gap-2"
+          :class="i > currentIndex ? 'text-muted-foreground/60' : ''"
+        >
+          <Check v-if="i < currentIndex" class="text-primary size-4 shrink-0" />
+          <Loader2
+            v-else-if="i === currentIndex"
+            class="text-primary size-4 shrink-0 animate-spin"
+          />
+          <Circle v-else class="size-4 shrink-0" />
+          <span>{{ stageLabel(stage) }}</span>
+          <span
+            v-if="i === currentIndex && detail"
+            class="text-muted-foreground ml-auto tabular-nums"
+          >
+            {{ detail }}
+          </span>
+        </li>
+      </ol>
+
+      <div class="space-y-2">
+        <Progress :model-value="percent" />
+        <div class="flex items-center justify-between">
+          <span class="text-muted-foreground text-xs tabular-nums">{{ percent }}%</span>
+          <Button variant="ghost" size="sm" @click="store.cancelScan()">
+            {{ t('mod.cancel') }}
+          </Button>
+        </div>
+      </div>
     </div>
-    <Progress :model-value="percent" />
-    <div v-if="store.scanning" class="flex justify-end">
-      <Button variant="ghost" size="sm" @click="store.cancelScan()">
-        {{ t('mod.cancel') }}
-      </Button>
+
+    <!-- 扫描出错 -->
+    <div
+      v-else-if="store.progress.stage === 'error'"
+      class="border-destructive/40 bg-destructive/10 text-destructive flex items-start gap-2 rounded-md border px-3 py-2 text-sm"
+    >
+      <TriangleAlert class="mt-0.5 size-4 shrink-0" />
+      <span>{{ store.progress.message || t('mod.stage.error') }}</span>
     </div>
-    <p v-if="store.progress.message" class="text-destructive text-xs">
-      {{ store.progress.message }}
-    </p>
+
+    <!-- 扫描完成（短暂提示） -->
+    <div
+      v-else
+      class="border-primary/30 bg-primary/10 text-primary flex items-center gap-2 rounded-md border px-3 py-2 text-sm"
+    >
+      <Check class="size-4 shrink-0" />
+      <span>{{ t('mod.stage.done') }}</span>
+    </div>
   </div>
 </template>

@@ -20,6 +20,7 @@
     }
   },
   "mod": {
+    "scanning": "Scanning…",
     "pickFolder": "Pick Mods Folder",
     "changeFolder": "Change Folder",
     "clearFolder": "Clear and forget folder",
