@@ -12,7 +12,6 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import { Button } from '@/components/ui/button'
-import StatusBadge from './StatusBadge.vue'
 import { formatBytes, formatDate, formatNumber } from '@/lib/format'
 import type { ModFile } from '@/types/mod'
 
@@ -64,12 +63,11 @@ function formatDateLocal(s?: string): string {
             </SheetDescription>
           </div>
         </div>
-        <div v-if="mod" class="flex flex-wrap items-center gap-1.5">
-          <StatusBadge :status="mod.status" />
-          <Badge v-if="mod.version" variant="secondary" class="font-mono">
+        <div v-if="mod?.version" class="flex flex-wrap items-center gap-1.5">
+          <Badge variant="secondary" class="font-mono">
             {{ mod.version.version_number }}
           </Badge>
-          <Badge v-if="mod.version" variant="outline">
+          <Badge variant="outline">
             {{ mod.version.version_type }}
           </Badge>
         </div>

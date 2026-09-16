@@ -11,9 +11,9 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
-import StatusBadge from './StatusBadge.vue'
 import { useModsStore } from '@/stores/mods'
 import { formatCompactNumber } from '@/lib/format'
+import { isUnrecognized } from '@/lib/mod-status'
 import type { ModFile } from '@/types/mod'
 
 const { t } = useI18n()
@@ -54,7 +54,6 @@ function rest(list: string[] | undefined): number {
           <TableHead>{{ t('mod.col.loaders') }}</TableHead>
           <TableHead>{{ t('mod.col.author') }}</TableHead>
           <TableHead class="text-right">{{ t('mod.col.downloads') }}</TableHead>
-          <TableHead>{{ t('mod.col.status') }}</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody class="[&>tr:not(:last-child)>td]:border-b">
@@ -63,6 +62,7 @@ function rest(list: string[] | undefined): number {
           :key="m.path"
           tabindex="0"
           class="focus-visible:bg-muted/50 cursor-pointer outline-none"
+          :class="isUnrecognized(m.status) && 'bg-destructive/10 hover:bg-destructive/15'"
           @click="onRowClick(m)"
           @keydown="onRowKeydown($event, m)"
         >
@@ -130,10 +130,9 @@ function rest(list: string[] | undefined): number {
             </span>
             <span v-else>—</span>
           </TableCell>
-          <TableCell><StatusBadge :status="m.status" /></TableCell>
         </TableRow>
         <TableRow v-if="rows.length === 0" class="hover:bg-transparent">
-          <TableCell :colspan="7" class="text-muted-foreground py-8 text-center">
+          <TableCell :colspan="6" class="text-muted-foreground py-8 text-center">
             {{ t('mod.noResults') }}
           </TableCell>
         </TableRow>

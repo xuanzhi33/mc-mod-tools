@@ -4,8 +4,8 @@ import { useI18n } from 'vue-i18n'
 import { Download, ExternalLink } from 'lucide-vue-next'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import StatusBadge from './StatusBadge.vue'
 import { formatCompactNumber } from '@/lib/format'
+import { isUnrecognized } from '@/lib/mod-status'
 import type { ModFile } from '@/types/mod'
 
 const props = defineProps<{ mod: ModFile }>()
@@ -31,6 +31,7 @@ function onKeydown(e: KeyboardEvent) {
     role="button"
     tabindex="0"
     class="cursor-pointer transition-shadow hover:shadow-md focus-visible:ring-ring outline-none focus-visible:ring-2"
+    :class="isUnrecognized(mod.status) && 'bg-destructive/10'"
     @click="emit('open', mod)"
     @keydown="onKeydown"
   >
@@ -49,12 +50,9 @@ function onKeydown(e: KeyboardEvent) {
         ?
       </div>
       <div class="min-w-0 flex-1">
-        <div class="flex items-center justify-between gap-2">
-          <h3 class="truncate font-medium">
-            {{ mod.project?.title ?? mod.name }}
-          </h3>
-          <StatusBadge :status="mod.status" />
-        </div>
+        <h3 class="truncate font-medium">
+          {{ mod.project?.title ?? mod.name }}
+        </h3>
         <p class="text-muted-foreground truncate text-xs">
           {{ mod.project?.author ?? '—' }}
         </p>

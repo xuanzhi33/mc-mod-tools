@@ -54,20 +54,6 @@
       "done": "扫描完成",
       "error": "扫描出错"
     },
-    "status": {
-      "pending": "待处理",
-      "hashing": "计算中",
-      "querying": "查询中",
-      "matched": "已识别",
-      "not_found": "未识别",
-      "error": "错误"
-    },
-    "filter": {
-      "all": "全部",
-      "matched": "已识别",
-      "not_found": "未识别",
-      "error": "错误"
-    },
     "view": {
       "table": "表格视图",
       "card": "卡片视图"
@@ -78,14 +64,10 @@
       "mcVersions": "MC 版本",
       "loaders": "加载器",
       "author": "作者",
-      "downloads": "下载量",
-      "status": "状态"
+      "downloads": "下载量"
     },
     "statsTotal": "共 {n} 个文件",
-    "statsMatched": "已识别 {n}",
-    "statsNotFound": "未识别 {n}",
-    "statsError": "错误 {n}",
-    "statsDownloads": "累计下载 {n}",
+    "statsProblem": "有问题 {n}",
     "statsShowing": "筛选后 {shown} / 共 {total}",
     "detail": {
       "description": "描述",

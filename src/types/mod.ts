@@ -105,4 +105,3 @@ export interface ScanProgress {
 }
 
 export type ViewMode = 'table' | 'card'
-export type StatusFilter = 'all' | 'matched' | 'not_found' | 'error'

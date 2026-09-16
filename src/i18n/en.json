@@ -54,20 +54,6 @@
       "done": "Scan complete",
       "error": "Scan failed"
     },
-    "status": {
-      "pending": "Pending",
-      "hashing": "Hashing",
-      "querying": "Querying",
-      "matched": "Matched",
-      "not_found": "Not Found",
-      "error": "Error"
-    },
-    "filter": {
-      "all": "All",
-      "matched": "Matched",
-      "not_found": "Not Found",
-      "error": "Error"
-    },
     "view": {
       "table": "Table View",
       "card": "Card View"
@@ -78,14 +64,10 @@
       "mcVersions": "MC Versions",
       "loaders": "Loaders",
       "author": "Author",
-      "downloads": "Downloads",
-      "status": "Status"
+      "downloads": "Downloads"
     },
     "statsTotal": "{n} files",
-    "statsMatched": "{n} matched",
-    "statsNotFound": "{n} not found",
-    "statsError": "{n} error",
-    "statsDownloads": "{n} total downloads",
+    "statsProblem": "{n} with issues",
     "statsShowing": "Showing {shown} of {total}",
     "detail": {
       "description": "Description",

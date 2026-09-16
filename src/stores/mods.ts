@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { computed, ref, shallowRef } from 'vue'
-import type { ModFile, ScanProgress, StatusFilter, ViewMode } from '@/types/mod'
+import type { ModFile, ScanProgress, ViewMode } from '@/types/mod'
 import {
   clearSavedHandle,
   ensurePermission,
@@ -45,14 +45,10 @@ export const useModsStore = defineStore('mods', () => {
   const progress = ref<ScanProgress>({ stage: 'idle', total: 0, processed: 0 })
   const scanning = ref(false)
   const viewMode = ref<ViewMode>('table')
-  const statusFilter = ref<StatusFilter>('all')
   const search = ref('')
 
   const filteredFiles = computed<ModFile[]>(() => {
     let list = modFiles.value
-    if (statusFilter.value !== 'all') {
-      list = list.filter((m) => m.status === statusFilter.value)
-    }
     const q = search.value.trim().toLowerCase()
     if (q) {
       list = list.filter((m) => {
@@ -73,10 +69,7 @@ export const useModsStore = defineStore('mods', () => {
   const stats = computed(() => {
     const total = modFiles.value.length
     const matched = modFiles.value.filter((m) => m.status === 'matched').length
-    const notFound = modFiles.value.filter((m) => m.status === 'not_found').length
-    const error = modFiles.value.filter((m) => m.status === 'error').length
-    const totalDownloads = modFiles.value.reduce((sum, m) => sum + (m.project?.downloads ?? 0), 0)
-    return { total, matched, notFound, error, totalDownloads }
+    return { total, problem: total - matched }
   })
 
   /** 应用启动时恢复上次选择的文件夹句柄 */
@@ -303,7 +296,6 @@ export const useModsStore = defineStore('mods', () => {
     progress,
     scanning,
     viewMode,
-    statusFilter,
     search,
     // computed
     filteredFiles,

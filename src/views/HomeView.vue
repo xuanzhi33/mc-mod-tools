@@ -7,13 +7,6 @@ import { Button } from '@/components/ui/button'
 import { ButtonGroup } from '@/components/ui/button-group'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import FolderPicker from '@/components/mod/FolderPicker.vue'
 import ScanProgress from '@/components/mod/ScanProgress.vue'
@@ -34,7 +27,7 @@ const settingsOpen = ref(false)
 
 const hasData = computed(() => !!store.dirHandle && store.modFiles.length > 0)
 
-const isFiltering = computed(() => store.statusFilter !== 'all' || store.search.trim() !== '')
+const isFiltering = computed(() => store.search.trim() !== '')
 
 const showEmpty = computed(() => {
   if (!store.supported) return true
@@ -133,17 +126,24 @@ onMounted(async () => {
             </button>
           </div>
 
-          <Select v-model="store.statusFilter">
-            <SelectTrigger size="sm" class="w-32">
-              <SelectValue :placeholder="t('mod.filter.all')" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">{{ t('mod.filter.all') }}</SelectItem>
-              <SelectItem value="matched">{{ t('mod.filter.matched') }}</SelectItem>
-              <SelectItem value="not_found">{{ t('mod.filter.not_found') }}</SelectItem>
-              <SelectItem value="error">{{ t('mod.filter.error') }}</SelectItem>
-            </SelectContent>
-          </Select>
+          <span v-if="!store.scanning" class="text-muted-foreground text-xs whitespace-nowrap">
+            {{
+              isFiltering
+                ? t('mod.statsShowing', {
+                    shown: store.filteredFiles.length,
+                    total: store.stats.total,
+                  })
+                : t('mod.statsTotal', { n: store.stats.total })
+            }}
+          </span>
+
+          <Badge
+            v-if="!store.scanning && store.stats.problem > 0"
+            variant="destructive"
+            class="whitespace-nowrap"
+          >
+            {{ t('mod.statsProblem', { n: store.stats.problem }) }}
+          </Badge>
 
           <TooltipProvider :delay-duration="300">
             <ButtonGroup class="ml-auto">
@@ -177,32 +177,6 @@ onMounted(async () => {
               </Tooltip>
             </ButtonGroup>
           </TooltipProvider>
-        </div>
-      </div>
-
-      <!-- 统计条 -->
-      <div v-if="hasData" class="bg-muted/30 border-t">
-        <div class="mx-auto flex max-w-7xl flex-wrap items-center gap-2 px-4 py-2 text-xs">
-          <Badge variant="secondary">
-            {{ t('mod.statsTotal', { n: store.stats.total }) }}
-          </Badge>
-          <Badge variant="default">
-            {{ t('mod.statsMatched', { n: store.stats.matched }) }}
-          </Badge>
-          <Badge variant="outline">
-            {{ t('mod.statsNotFound', { n: store.stats.notFound }) }}
-          </Badge>
-          <Badge v-if="store.stats.error > 0" variant="destructive">
-            {{ t('mod.statsError', { n: store.stats.error }) }}
-          </Badge>
-          <Badge v-if="isFiltering" variant="outline" class="border-dashed">
-            {{
-              t('mod.statsShowing', { shown: store.filteredFiles.length, total: store.stats.total })
-            }}
-          </Badge>
-          <span class="text-muted-foreground ml-auto">
-            {{ t('mod.statsDownloads', { n: store.stats.totalDownloads.toLocaleString() }) }}
-          </span>
         </div>
       </div>
     </header>
