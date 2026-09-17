@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { computed, ref, shallowRef } from 'vue'
+import { computed, ref, shallowRef, watch } from 'vue'
 import type { ModFile, ScanProgress } from '@/types/mod'
 import {
   clearSavedHandle,
@@ -11,8 +11,14 @@ import {
   pickDirectory,
 } from '@/lib/fs'
 import { computeSha1 } from '@/lib/hash'
-import { fetchProjectAuthors, fetchProjectsByIds, fetchVersionsByHashes } from '@/lib/modrinth'
+import {
+  fetchProjectAuthors,
+  fetchProjectsByIds,
+  fetchUpdatedVersions,
+  fetchVersionsByHashes,
+} from '@/lib/modrinth'
 import { compareMcVersions } from '@/lib/mc-version'
+import { hasUpdate } from '@/lib/update'
 
 const HASH_CONCURRENCY = 4
 
@@ -131,6 +137,68 @@ export const useModsStore = defineStore('mods', () => {
   /** 推断的加载器：出现次数最多，并列时优先 fabric */
   const inferredLoader = computed<string>(() => availableLoaders.value[0] ?? '')
 
+  /** 有可用更新的模组数量 */
+  const updatableCount = computed(() => modFiles.value.filter((m) => hasUpdate(m)).length)
+
+  /** 更新检查进行中 */
+  const updating = ref(false)
+
+  /** 更新检查当前进度（0-100） */
+  const updatePercent = computed(() => {
+    const p = progress.value
+    return p.stage === 'querying-updates' && p.total > 0
+      ? Math.round((p.processed / p.total) * 100)
+      : 0
+  })
+
+  /** 记录最近一次更新检查所用的 profile（loader|mcVersion） */
+  const checkedKey = ref('')
+
+  function currentProfileKey(): string {
+    return `${loader.value}|${mcVersion.value}`
+  }
+
+  /**
+   * 按当前 profile（加载器 / MC 版本）检查更新。
+   * 结果写入 `ModFile.update`；接口未收录的 hash 记为 null（无法确定）。
+   */
+  async function checkUpdates(): Promise<void> {
+    const matched = modFiles.value.filter((m) => m.status === 'matched' && m.sha1)
+    if (matched.length === 0) return
+
+    const key = currentProfileKey()
+    const hashes = matched.map((m) => m.sha1 as string)
+    updating.value = true
+    try {
+      progress.value = { stage: 'querying-updates', total: hashes.length, processed: 0 }
+      const updateMap = await fetchUpdatedVersions(
+        hashes,
+        {
+          loaders: loader.value ? [loader.value] : undefined,
+          gameVersions: mcVersion.value ? [mcVersion.value] : undefined,
+        },
+        (done, total) => {
+          progress.value = { stage: 'querying-updates', total, processed: done }
+        },
+      )
+      for (const m of matched) {
+        m.update = (m.sha1 && updateMap[m.sha1]) || null
+      }
+      // 期间用户又切了 profile，则本次结果不算「已按当前 profile 检查」
+      if (currentProfileKey() === key) checkedKey.value = key
+    } finally {
+      updating.value = false
+    }
+  }
+
+  // 用户切换加载器 / MC 版本后，自动按新 profile 重新检查
+  watch([loader, mcVersion], () => {
+    if (scanning.value || currentProfileKey() === checkedKey.value) return
+    checkUpdates().catch(() => {
+      // 检查失败不影响已展示的列表
+    })
+  })
+
   /** 应用启动时恢复上次选择的文件夹句柄 */
   async function restoreSavedHandle(): Promise<boolean> {
     if (!supported) return false
@@ -157,6 +225,7 @@ export const useModsStore = defineStore('mods', () => {
     modFiles.value = []
     mcVersion.value = ''
     loader.value = ''
+    checkedKey.value = ''
     progress.value = { stage: 'idle', total: 0, processed: 0 }
     return true
   }
@@ -332,6 +401,17 @@ export const useModsStore = defineStore('mods', () => {
         loader.value = inferredLoader.value
       }
 
+      if (cancelled) return
+
+      // 6. 按推断出的 profile 自动检查更新（失败不影响列表结果）
+      try {
+        await checkUpdates()
+      } catch {
+        // 忽略：仅缺少更新提示，扫描结果仍然有效
+      }
+
+      if (cancelled) return
+
       progress.value = { stage: 'done', total: files.length, processed: files.length }
     } catch (e) {
       progress.value = {
@@ -353,6 +433,7 @@ export const useModsStore = defineStore('mods', () => {
     modFiles.value = []
     mcVersion.value = ''
     loader.value = ''
+    checkedKey.value = ''
     progress.value = { stage: 'idle', total: 0, processed: 0 }
     await clearSavedHandle()
   }
@@ -375,6 +456,9 @@ export const useModsStore = defineStore('mods', () => {
     inferredMcVersion,
     availableLoaders,
     inferredLoader,
+    updatableCount,
+    updating,
+    updatePercent,
     // actions
     restoreSavedHandle,
     selectFolder,

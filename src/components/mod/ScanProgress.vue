@@ -54,6 +54,8 @@ function stageLabel(stage: ScanStep): string {
       return t('mod.stage.queryingProjects')
     case 'querying-authors':
       return t('mod.stage.queryingAuthors')
+    case 'querying-updates':
+      return t('mod.stage.queryingUpdates')
   }
 }
 </script>

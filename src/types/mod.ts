@@ -82,6 +82,8 @@ export interface ModFile {
   status: ModFileStatus
   /** Modrinth 返回的版本信息 */
   version?: ModrinthVersion
+  /** 相对当前 profile（加载器 + MC 版本）的最新版本；null = 已检查但无法确定 */
+  update?: ModrinthVersion | null
   /** Modrinth 返回的项目信息 */
   project?: ModrinthProject
   error?: string
@@ -94,6 +96,7 @@ export type ScanStage =
   | 'querying-versions'
   | 'querying-projects'
   | 'querying-authors'
+  | 'querying-updates'
   | 'done'
   | 'error'
 

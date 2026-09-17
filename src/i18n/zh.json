@@ -54,6 +54,7 @@
       "queryingVersions": "正在查询 Modrinth 版本信息…",
       "queryingProjects": "正在查询 Modrinth 项目详情…",
       "queryingAuthors": "正在查询模组作者…",
+      "queryingUpdates": "正在检查更新…",
       "done": "扫描完成",
       "error": "扫描出错"
     },
@@ -69,6 +70,7 @@
     },
     "statsTotal": "共 {n} 个文件",
     "statsProblem": "有问题 {n}",
+    "statsUpdatable": "可更新 {n}",
     "statsShowing": "筛选后 {shown} / 共 {total}",
     "detail": {
       "description": "描述",

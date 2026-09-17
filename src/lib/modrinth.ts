@@ -19,6 +19,7 @@ const HEADERS: HeadersInit = {
 const VERSION_FILES_BATCH = 100
 const PROJECTS_BATCH = 100 // 单次 GET /projects?ids=[] 最多 100 个 id
 const SEARCH_BATCH = 100 // 单次 GET /search 的 facet / limit 上限
+const UPDATE_BATCH = 100 // 单次 POST /version_files/update 的 hash 数
 
 async function request<T>(url: string, init?: RequestInit): Promise<T> {
   const res = await fetch(url, init)
@@ -137,6 +138,50 @@ export async function fetchProjectAuthors(
     done += batch.length
     onProgress?.(done, total)
     if (i + SEARCH_BATCH < unique.length) {
+      await sleep(120)
+    }
+  }
+
+  return result
+}
+
+/**
+ * 根据 hash 批量查询「相对指定 profile 的最新版本」。
+ *
+ * 走 `POST /version_files/update`，服务端会按 `loaders` / `game_versions`
+ * 过滤后为每个 hash 返回最新版本：
+ * - 已是最新时会返回**同一个版本**（用 version.id 判断）
+ * - 未收录的 hash 不会出现在结果里
+ * - 过滤条件整批共享，因此整个实例只需少量请求
+ */
+export async function fetchUpdatedVersions(
+  hashes: string[],
+  filter: { loaders?: string[]; gameVersions?: string[] } = {},
+  onProgress?: (done: number, total: number) => void,
+): Promise<Record<string, ModrinthVersion>> {
+  const result: Record<string, ModrinthVersion> = {}
+  const unique = [...new Set(hashes.filter(Boolean))]
+  const total = unique.length
+  let done = 0
+
+  for (let i = 0; i < unique.length; i += UPDATE_BATCH) {
+    const batch = unique.slice(i, i + UPDATE_BATCH)
+    const body = JSON.stringify({
+      hashes: batch,
+      algorithm: 'sha1',
+      // 过滤条件为空时省略该字段（= 不限制）
+      ...(filter.loaders?.length ? { loaders: filter.loaders } : {}),
+      ...(filter.gameVersions?.length ? { game_versions: filter.gameVersions } : {}),
+    })
+
+    const data = await request<Record<string, ModrinthVersion>>(
+      `${API_BASE}/version_files/update`,
+      { method: 'POST', headers: HEADERS, body },
+    )
+    Object.assign(result, data)
+    done += batch.length
+    onProgress?.(done, total)
+    if (i + UPDATE_BATCH < unique.length) {
       await sleep(120)
     }
   }

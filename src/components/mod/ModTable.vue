@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { Download } from 'lucide-vue-next'
+import { ArrowUpRight, Download } from 'lucide-vue-next'
 import {
   Table,
   TableBody,
@@ -14,6 +14,7 @@ import { Badge } from '@/components/ui/badge'
 import { useModsStore } from '@/stores/mods'
 import { formatBytes, formatCompactNumber, formatDate, isWithinDays } from '@/lib/format'
 import { isUnrecognized } from '@/lib/mod-status'
+import { hasUpdate, isUpToDate } from '@/lib/update'
 import type { ModFile } from '@/types/mod'
 
 const { t, locale } = useI18n()
@@ -82,8 +83,24 @@ const rows = computed(() => store.filteredFiles)
               </div>
             </div>
           </TableCell>
-          <TableCell class="font-mono text-xs">
-            {{ m.version?.version_number ?? '—' }}
+          <TableCell class="font-mono text-xs whitespace-nowrap">
+            <template v-if="m.version">
+              <div
+                :class="
+                  hasUpdate(m) ? 'text-orange-500' : isUpToDate(m) ? 'text-emerald-500' : undefined
+                "
+              >
+                {{ m.version.version_number }}
+              </div>
+              <div
+                v-if="hasUpdate(m)"
+                class="text-muted-foreground mt-0.5 flex items-center gap-1 text-[11px]"
+              >
+                <ArrowUpRight class="size-3 shrink-0" />
+                <span>{{ m.update?.version_number }}</span>
+              </div>
+            </template>
+            <span v-else>—</span>
           </TableCell>
           <TableCell class="text-muted-foreground text-xs tabular-nums whitespace-nowrap">
             {{ formatBytes(m.size) }}

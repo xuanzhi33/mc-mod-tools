@@ -7,20 +7,22 @@ export const SCAN_STAGES = [
   'querying-versions',
   'querying-projects',
   'querying-authors',
+  'querying-updates',
 ] as const
 
 export type ScanStep = (typeof SCAN_STAGES)[number]
 
 /**
  * 各阶段的进度权重（合计 100），按预期耗时分配：
- * 本地哈希读取磁盘 + 计算 SHA-1，占大头；三个网络阶段各只有少量请求。
+ * 本地哈希读取磁盘 + 计算 SHA-1，占大头；四个网络阶段各只有少量请求。
  */
 const STAGE_WEIGHT: Record<ScanStep, number> = {
   listing: 5,
-  hashing: 65,
+  hashing: 60,
   'querying-versions': 15,
   'querying-projects': 8,
   'querying-authors': 7,
+  'querying-updates': 5,
 }
 
 /** 当前阶段之前所有阶段的权重之和 */

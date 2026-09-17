@@ -6,6 +6,7 @@ import { toast } from 'vue-sonner'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
+import { Progress } from '@/components/ui/progress'
 import {
   Select,
   SelectContent,
@@ -149,6 +150,24 @@ onMounted(async () => {
           >
             {{ t('mod.statsProblem', { n: store.stats.problem }) }}
           </Badge>
+
+          <Badge
+            v-if="!store.scanning && store.updatableCount > 0"
+            class="border-orange-500/30 bg-orange-500/10 text-orange-500 whitespace-nowrap"
+          >
+            {{ t('mod.statsUpdatable', { n: store.updatableCount }) }}
+          </Badge>
+
+          <div
+            v-if="!store.scanning && store.updating"
+            class="flex items-center gap-2"
+            :title="t('mod.stage.queryingUpdates')"
+          >
+            <span class="text-muted-foreground text-xs whitespace-nowrap">
+              {{ t('mod.stage.queryingUpdates') }}
+            </span>
+            <Progress :model-value="store.updatePercent" class="h-1 w-20" />
+          </div>
 
           <div
             v-if="!store.scanning && store.availableMcVersions.length > 0"

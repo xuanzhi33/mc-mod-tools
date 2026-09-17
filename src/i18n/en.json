@@ -54,6 +54,7 @@
       "queryingVersions": "Querying Modrinth versions…",
       "queryingProjects": "Querying Modrinth projects…",
       "queryingAuthors": "Querying mod authors…",
+      "queryingUpdates": "Checking for updates…",
       "done": "Scan complete",
       "error": "Scan failed"
     },
@@ -69,6 +70,7 @@
     },
     "statsTotal": "{n} files",
     "statsProblem": "{n} with issues",
+    "statsUpdatable": "{n} updatable",
     "statsShowing": "Showing {shown} of {total}",
     "detail": {
       "description": "Description",
