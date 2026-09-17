@@ -85,7 +85,9 @@
       "filePath": "文件路径",
       "fileSize": "文件大小",
       "error": "错误信息",
-      "viewVersion": "查看版本"
+      "viewVersion": "查看版本",
+      "expand": "展开全部",
+      "collapse": "收起"
     },
     "security": {
       "title": "安全 / 信任",
@@ -99,6 +101,7 @@
       "licenseCustom": "自定义",
       "source": "公开源码",
       "notProvided": "未提供",
+      "starsHint": "GitHub 星标数（shields.io 近似值）",
       "community": "反馈渠道",
       "issues": "问题反馈",
       "wiki": "文档",

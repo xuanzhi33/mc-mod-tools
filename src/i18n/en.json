@@ -85,7 +85,9 @@
       "filePath": "File Path",
       "fileSize": "File Size",
       "error": "Error",
-      "viewVersion": "View Version"
+      "viewVersion": "View Version",
+      "expand": "Expand all",
+      "collapse": "Collapse"
     },
     "security": {
       "title": "Safety / Trust",
@@ -99,6 +101,7 @@
       "licenseCustom": "custom",
       "source": "Source code",
       "notProvided": "Not provided",
+      "starsHint": "GitHub stars (approximate, via shields.io)",
       "community": "Community",
       "issues": "Issues",
       "wiki": "Wiki",

@@ -7,13 +7,22 @@ import type { DisclosureType, ModFile, ModrinthProject } from '@/types/mod'
  * medium = 值得注意
  * info   = 仅作告知
  */
+/**
+ * 各披露项的风险等级（用于着色与生成风险提示）。
+ *
+ * high   = 直接涉及数据/系统安全，会进入「风险提示」
+ * medium = 值得注意
+ * info   = 仅作告知，不强调
+ */
 export const DISCLOSURE_SEVERITY: Record<DisclosureType, 'high' | 'medium' | 'info'> = {
-  telemetry_always_active: 'high',
-  telemetry_opt_out: 'high',
+  // 会读写系统 / 其它进程，风险最高
   system_interactions: 'high',
-  telemetry: 'medium',
-  telemetry_opt_in: 'medium',
   advertisements: 'medium',
+  // 遥测很常见且多为合规/统计目的，仅作告知，不在风险提示中强调
+  telemetry: 'info',
+  telemetry_opt_in: 'info',
+  telemetry_opt_out: 'info',
+  telemetry_always_active: 'info',
   epilepsy_triggers: 'info',
   paid_features: 'info',
   derivative_work: 'info',

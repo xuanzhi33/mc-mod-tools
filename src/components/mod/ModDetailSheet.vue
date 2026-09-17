@@ -1,15 +1,7 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import {
-  Download,
-  ExternalLink,
-  FileText,
-  Hash,
-  ShieldAlert,
-  ShieldCheck,
-  User,
-} from 'lucide-vue-next'
+import { ExternalLink, FileText, ShieldAlert, ShieldCheck, Star } from 'lucide-vue-next'
 import {
   Sheet,
   SheetContent,
@@ -21,6 +13,7 @@ import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import { Button } from '@/components/ui/button'
 import { formatBytes, formatDate, formatNumber } from '@/lib/format'
+import { fetchGitHubStars, parseGitHubRepo } from '@/lib/github'
 import { DISCLOSURE_SEVERITY, embeddedDependencyCount, isCustomLicense } from '@/lib/security'
 import type { DisclosureType, Environment, ModFile } from '@/types/mod'
 
@@ -81,6 +74,65 @@ const environments = computed<Environment[]>(() => {
 })
 
 const embeddedDeps = computed(() => (props.mod ? embeddedDependencyCount(props.mod) : 0))
+
+const gameVersions = computed(() => props.mod?.version?.game_versions ?? [])
+const loaders = computed(() => props.mod?.version?.loaders ?? [])
+
+const showAllGameVersions = ref(false)
+const showAllLoaders = ref(false)
+
+/** 折叠时 MC 版本只留最新一个，加载器只留第一个 */
+const visibleGameVersions = computed(() =>
+  showAllGameVersions.value ? gameVersions.value : gameVersions.value.slice(-1),
+)
+const visibleLoaders = computed(() =>
+  showAllLoaders.value ? loaders.value : loaders.value.slice(0, 1),
+)
+
+// 切换模组时收起
+watch(
+  () => props.mod?.path,
+  () => {
+    showAllGameVersions.value = false
+    showAllLoaders.value = false
+  },
+)
+
+/** 源码仓库（仅 GitHub 才支持查 star） */
+const githubRepo = computed(() => parseGitHubRepo(props.mod?.project?.source_url))
+
+/** 近似 star 数（shields.io），null = 未知/失败 */
+const stars = ref<string | null>(null)
+const starsLoading = ref(false)
+let starsReqId = 0
+
+/** 仅在面板打开时按需请求（shields 响应自带 30 分钟缓存，故不再自行缓存） */
+async function loadStars() {
+  const repo = githubRepo.value
+  const id = ++starsReqId
+  stars.value = null
+  if (!props.modelValue || !repo) {
+    starsLoading.value = false
+    return
+  }
+  starsLoading.value = true
+  try {
+    const value = await fetchGitHubStars(repo.owner, repo.repo)
+    if (id === starsReqId) stars.value = value
+  } catch {
+    // 失败则静默不展示
+  } finally {
+    if (id === starsReqId) starsLoading.value = false
+  }
+}
+
+watch(
+  () => [props.modelValue, githubRepo.value?.owner, githubRepo.value?.repo] as const,
+  loadStars,
+  {
+    immediate: true,
+  },
+)
 
 /** 用于 VirusTotal 查询的主文件 */
 const primaryFile = computed(() => {
@@ -222,15 +274,11 @@ const warnings = computed<Warning[]>(() => {
           </h4>
           <dl class="text-sm">
             <div class="flex justify-between py-1">
-              <dt class="text-muted-foreground inline-flex items-center gap-1">
-                <User class="size-3" />{{ t('mod.detail.author') }}
-              </dt>
+              <dt class="text-muted-foreground">{{ t('mod.detail.author') }}</dt>
               <dd>{{ mod.project?.author ?? '—' }}</dd>
             </div>
             <div class="flex justify-between py-1">
-              <dt class="text-muted-foreground inline-flex items-center gap-1">
-                <Download class="size-3" />{{ t('mod.detail.downloads') }}
-              </dt>
+              <dt class="text-muted-foreground">{{ t('mod.detail.downloads') }}</dt>
               <dd class="flex items-center gap-1 tabular-nums" :title="t('mod.downloadsHint')">
                 <span>{{ formatNumber(mod.version?.downloads ?? 0) }}</span>
                 <span>/</span>
@@ -258,33 +306,74 @@ const warnings = computed<Warning[]>(() => {
             {{ t('mod.detail.versionInfo') }}
           </h4>
           <dl class="text-sm">
-            <div class="py-1">
-              <dt class="text-muted-foreground mb-1">{{ t('mod.col.mcVersions') }}</dt>
-              <dd class="flex flex-wrap gap-1">
-                <Badge
-                  v-for="gv in mod.version?.game_versions"
-                  :key="gv"
-                  variant="outline"
-                  class="font-mono text-xs"
-                >
-                  {{ gv }}
-                </Badge>
-                <span v-if="!mod.version?.game_versions?.length">—</span>
-              </dd>
-            </div>
-            <div class="py-1">
-              <dt class="text-muted-foreground mb-1">{{ t('mod.col.loaders') }}</dt>
-              <dd class="flex flex-wrap gap-1">
-                <Badge
-                  v-for="ld in mod.version?.loaders"
-                  :key="ld"
-                  variant="secondary"
-                  class="font-mono text-xs"
-                >
-                  {{ ld }}
-                </Badge>
-                <span v-if="!mod.version?.loaders?.length">—</span>
-              </dd>
+            <div class="grid grid-cols-2 gap-x-3 gap-y-1 py-1">
+              <!-- MC 版本：折叠时只显示最新一个 -->
+              <div class="min-w-0">
+                <dt class="text-muted-foreground mb-1">{{ t('mod.col.mcVersions') }}</dt>
+                <dd class="flex flex-wrap items-center gap-1">
+                  <template v-if="gameVersions.length">
+                    <Badge
+                      v-for="gv in visibleGameVersions"
+                      :key="gv"
+                      variant="outline"
+                      class="font-mono text-xs"
+                    >
+                      {{ gv }}
+                    </Badge>
+                    <Badge
+                      v-if="gameVersions.length > 1"
+                      as-child
+                      variant="outline"
+                      class="font-mono text-xs"
+                    >
+                      <button
+                        type="button"
+                        class="cursor-pointer"
+                        :title="
+                          showAllGameVersions ? t('mod.detail.collapse') : t('mod.detail.expand')
+                        "
+                        @click="showAllGameVersions = !showAllGameVersions"
+                      >
+                        {{ showAllGameVersions ? '−' : `+${gameVersions.length - 1}` }}
+                      </button>
+                    </Badge>
+                  </template>
+                  <span v-else class="text-muted-foreground text-xs">—</span>
+                </dd>
+              </div>
+
+              <!-- 加载器：折叠时只显示第一个 -->
+              <div class="min-w-0">
+                <dt class="text-muted-foreground mb-1">{{ t('mod.col.loaders') }}</dt>
+                <dd class="flex flex-wrap items-center gap-1">
+                  <template v-if="loaders.length">
+                    <Badge
+                      v-for="ld in visibleLoaders"
+                      :key="ld"
+                      variant="secondary"
+                      class="font-mono text-xs"
+                    >
+                      {{ ld }}
+                    </Badge>
+                    <Badge
+                      v-if="loaders.length > 1"
+                      as-child
+                      variant="secondary"
+                      class="font-mono text-xs"
+                    >
+                      <button
+                        type="button"
+                        class="cursor-pointer"
+                        :title="showAllLoaders ? t('mod.detail.collapse') : t('mod.detail.expand')"
+                        @click="showAllLoaders = !showAllLoaders"
+                      >
+                        {{ showAllLoaders ? '−' : `+${loaders.length - 1}` }}
+                      </button>
+                    </Badge>
+                  </template>
+                  <span v-else class="text-muted-foreground text-xs">—</span>
+                </dd>
+              </div>
             </div>
             <div class="flex justify-between py-1">
               <dt class="text-muted-foreground">{{ t('mod.detail.published') }}</dt>
@@ -293,48 +382,12 @@ const warnings = computed<Warning[]>(() => {
           </dl>
         </section>
 
-        <Separator />
-
-        <!-- 文件信息 -->
-        <section class="space-y-2">
-          <h4 class="text-muted-foreground text-xs tracking-wide uppercase">
-            {{ t('mod.detail.fileInfo') }}
-          </h4>
-          <dl class="text-sm">
-            <div class="py-1">
-              <dt class="text-muted-foreground">{{ t('mod.detail.filePath') }}</dt>
-              <dd class="font-mono text-xs break-all">{{ mod.path }}</dd>
-            </div>
-            <div class="flex justify-between py-1">
-              <dt class="text-muted-foreground">{{ t('mod.detail.fileSize') }}</dt>
-              <dd class="tabular-nums">{{ formatBytes(mod.size) }}</dd>
-            </div>
-            <div v-if="mod.sha1" class="py-1">
-              <dt class="text-muted-foreground inline-flex items-center gap-1">
-                <Hash class="size-3" />SHA-1
-              </dt>
-              <dd class="font-mono text-xs break-all">{{ mod.sha1 }}</dd>
-            </div>
-          </dl>
-        </section>
-
-        <!-- 错误信息 -->
-        <section v-if="mod.error" class="space-y-1">
-          <h4 class="text-destructive text-xs tracking-wide uppercase">
-            {{ t('mod.detail.error') }}
-          </h4>
-          <p class="text-destructive text-xs">{{ mod.error }}</p>
-        </section>
-
         <!-- 安全 / 信任 -->
         <template v-if="mod.project">
           <Separator />
 
           <section class="space-y-2">
-            <h4
-              class="text-muted-foreground flex items-center gap-1 text-xs tracking-wide uppercase"
-            >
-              <ShieldCheck class="size-3" />
+            <h4 class="text-muted-foreground text-xs tracking-wide uppercase">
               {{ t('mod.security.title') }}
             </h4>
 
@@ -453,6 +506,14 @@ const warnings = computed<Warning[]>(() => {
                   <span v-else class="text-muted-foreground">
                     {{ t('mod.security.notProvided') }}
                   </span>
+                  <span
+                    v-if="githubRepo && (stars || starsLoading)"
+                    class="text-muted-foreground ml-1.5 inline-flex items-center gap-0.5 align-middle text-xs whitespace-nowrap"
+                    :title="t('mod.security.starsHint')"
+                  >
+                    <Star class="size-3 shrink-0" />
+                    {{ stars ?? '…' }}
+                  </span>
                 </dd>
               </div>
 
@@ -558,6 +619,37 @@ const warnings = computed<Warning[]>(() => {
             </dl>
           </section>
         </template>
+
+        <Separator />
+
+        <!-- 文件信息 -->
+        <section class="space-y-2">
+          <h4 class="text-muted-foreground text-xs tracking-wide uppercase">
+            {{ t('mod.detail.fileInfo') }}
+          </h4>
+          <dl class="text-sm">
+            <div class="py-1">
+              <dt class="text-muted-foreground">{{ t('mod.detail.filePath') }}</dt>
+              <dd class="font-mono text-xs break-all">{{ mod.path }}</dd>
+            </div>
+            <div class="flex justify-between py-1">
+              <dt class="text-muted-foreground">{{ t('mod.detail.fileSize') }}</dt>
+              <dd class="tabular-nums">{{ formatBytes(mod.size) }}</dd>
+            </div>
+            <div v-if="mod.sha1" class="py-1">
+              <dt class="text-muted-foreground">SHA-1</dt>
+              <dd class="font-mono text-xs break-all">{{ mod.sha1 }}</dd>
+            </div>
+          </dl>
+        </section>
+
+        <!-- 错误信息 -->
+        <section v-if="mod.error" class="space-y-1">
+          <h4 class="text-destructive text-xs tracking-wide uppercase">
+            {{ t('mod.detail.error') }}
+          </h4>
+          <p class="text-destructive text-xs">{{ mod.error }}</p>
+        </section>
       </div>
     </SheetContent>
   </Sheet>
