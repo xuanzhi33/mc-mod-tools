@@ -8,7 +8,7 @@
 
 - **本地读取**：文件夹句柄存 IndexedDB，刷新页面无需重选
 - **批量识别**：并发（限 4）计算 SHA-1 → `/version_files` → `/projects` → `/search`，每批 100 个
-- **自动更新检查**：扫描末尾按 `加载器 + MC 版本` 调用 `/version_files/update`；已最新标绿，可更新标橙并显示新版本号
+- **自动更新检查**：扫描末尾按 `加载器 + MC 版本` 调用 `/version_files/update`；已最新标绿，可更新标橙并显示新版本号，**悬停目标版本号可查看该版本的更新日志**
 - **安全 / 信任信息**：作者申报披露、审核与变现状态、许可证与公开源码、官方精选、内置依赖、SHA-1 + VirusTotal 直查、时间线
 - **工具栏**：搜索、文件总数、可更新数、加载器与 MC 版本下拉（自动推断，可手动改）
 - **风险标记**：模组名称右侧显示风险图标（红 = 高风险 / 橙 = 需要注意），悬停即可查看具体风险项
@@ -74,13 +74,14 @@ src/
 │   ├── mc-version.ts  # MC 版本号比较
 │   ├── progress.ts    # 扫描阶段与总进度
 │   ├── update.ts      # 更新判定
+│   ├── changelog.ts   # 更新日志（Markdown）极简解析
 │   ├── security.ts    # 披露风险等级与风险提示判定
 │   ├── github.ts      # 源码仓库星标查询
 │   ├── mod-status.ts  # 识别状态判定
 │   └── format.ts      # 数字 / 字节 / 日期格式化
 ├── stores/mods.ts     # 扫描主流程与推断逻辑
 ├── views/HomeView.vue
-├── components/mod/    # FolderPicker / ScanProgress / ModTable / ModRiskIcon / ModDetailSheet / SettingsDialog / EmptyState
+├── components/mod/    # FolderPicker / ScanProgress / ModTable / ModRiskIcon / ModUpdateHint / ModDetailSheet / SettingsDialog / EmptyState
 └── i18n/{zh,en}.json
 ```
 

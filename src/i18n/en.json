@@ -45,6 +45,7 @@
     "searchPlaceholder": "Search by name, author or filename…",
     "searchClear": "Clear search",
     "downloadsHint": "Version downloads / Project total",
+    "changelog": "Changelog",
     "mcVersionLabel": "MC version",
     "loaderLabel": "Loader",
     "noResults": "No matching mods",

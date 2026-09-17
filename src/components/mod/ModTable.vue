@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { ArrowUpRight, Download } from 'lucide-vue-next'
+import { Download } from 'lucide-vue-next'
 import {
   Table,
   TableBody,
@@ -13,6 +13,7 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import ModRiskIcon from '@/components/mod/ModRiskIcon.vue'
+import ModUpdateHint from '@/components/mod/ModUpdateHint.vue'
 import { useModsStore } from '@/stores/mods'
 import { formatBytes, formatCompactNumber, formatDate } from '@/lib/format'
 import { isUnrecognized } from '@/lib/mod-status'
@@ -103,13 +104,7 @@ const rows = computed(() => store.filteredFiles)
                 >
                   {{ m.version.version_number }}
                 </div>
-                <div
-                  v-if="hasUpdate(m)"
-                  class="text-muted-foreground mt-0.5 flex items-center gap-1 text-[11px]"
-                >
-                  <ArrowUpRight class="size-3 shrink-0" />
-                  <span>{{ m.update?.version_number }}</span>
-                </div>
+                <ModUpdateHint v-if="hasUpdate(m)" :version="m.update!" />
               </template>
               <span v-else>—</span>
             </TableCell>

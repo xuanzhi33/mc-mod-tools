@@ -45,6 +45,7 @@
     "searchPlaceholder": "搜索模组名、作者或文件名…",
     "searchClear": "清除搜索",
     "downloadsHint": "本版本下载量 / 项目总下载量",
+    "changelog": "更新日志",
     "mcVersionLabel": "MC 版本",
     "loaderLabel": "加载器",
     "noResults": "没有匹配的模组",
