@@ -45,6 +45,7 @@
     "searchPlaceholder": "Search by name, author or filename…",
     "searchClear": "Clear search",
     "downloadsHint": "Version downloads / Project total",
+    "mcVersionLabel": "MC version",
     "noResults": "No matching mods",
     "stage": {
       "listing": "Listing jar files…",

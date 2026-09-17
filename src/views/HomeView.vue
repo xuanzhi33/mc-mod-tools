@@ -6,6 +6,13 @@ import { toast } from 'vue-sonner'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import FolderPicker from '@/components/mod/FolderPicker.vue'
 import ScanProgress from '@/components/mod/ScanProgress.vue'
@@ -142,6 +149,25 @@ onMounted(async () => {
           >
             {{ t('mod.statsProblem', { n: store.stats.problem }) }}
           </Badge>
+
+          <div
+            v-if="!store.scanning && store.availableMcVersions.length > 0"
+            class="ml-auto flex items-center gap-2"
+          >
+            <span class="text-muted-foreground text-xs whitespace-nowrap">
+              {{ t('mod.mcVersionLabel') }}
+            </span>
+            <Select v-model="store.mcVersion">
+              <SelectTrigger size="sm" class="w-28 font-mono">
+                <SelectValue>{{ store.mcVersion }}</SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem v-for="v in store.availableMcVersions" :key="v" :value="v">
+                  {{ v }}
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
       </div>
     </header>

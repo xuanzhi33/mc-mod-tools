@@ -12,6 +12,7 @@ import {
 } from '@/lib/fs'
 import { computeSha1 } from '@/lib/hash'
 import { fetchProjectAuthors, fetchProjectsByIds, fetchVersionsByHashes } from '@/lib/modrinth'
+import { compareMcVersions } from '@/lib/mc-version'
 
 const HASH_CONCURRENCY = 4
 
@@ -45,6 +46,7 @@ export const useModsStore = defineStore('mods', () => {
   const progress = ref<ScanProgress>({ stage: 'idle', total: 0, processed: 0 })
   const scanning = ref(false)
   const search = ref('')
+  const mcVersion = ref('')
 
   const filteredFiles = computed<ModFile[]>(() => {
     let list = modFiles.value
@@ -71,6 +73,35 @@ export const useModsStore = defineStore('mods', () => {
     return { total, problem: total - matched }
   })
 
+  /** 统计每个 MC 版本被多少个已识别模组支持 */
+  function mcVersionCounts(): Map<string, number> {
+    const counts = new Map<string, number>()
+    for (const m of modFiles.value) {
+      for (const gv of m.version?.game_versions ?? []) {
+        counts.set(gv, (counts.get(gv) ?? 0) + 1)
+      }
+    }
+    return counts
+  }
+
+  /** 当前已识别模组支持的 MC 版本集合（新 → 旧） */
+  const availableMcVersions = computed<string[]>(() =>
+    [...mcVersionCounts().keys()].sort((a, b) => compareMcVersions(b, a)),
+  )
+
+  /** 推断的 MC 版本：出现次数最多，并列时取较新 */
+  const inferredMcVersion = computed<string>(() => {
+    let best = ''
+    let bestCount = 0
+    for (const [version, count] of mcVersionCounts()) {
+      if (count > bestCount || (count === bestCount && compareMcVersions(version, best) > 0)) {
+        best = version
+        bestCount = count
+      }
+    }
+    return best
+  })
+
   /** 应用启动时恢复上次选择的文件夹句柄 */
   async function restoreSavedHandle(): Promise<boolean> {
     if (!supported) return false
@@ -95,6 +126,7 @@ export const useModsStore = defineStore('mods', () => {
     dirHandle.value = handle
     dirName.value = handle.name
     modFiles.value = []
+    mcVersion.value = ''
     progress.value = { stage: 'idle', total: 0, processed: 0 }
     return true
   }
@@ -263,6 +295,10 @@ export const useModsStore = defineStore('mods', () => {
         }
       }
 
+      if (!mcVersion.value || !availableMcVersions.value.includes(mcVersion.value)) {
+        mcVersion.value = inferredMcVersion.value
+      }
+
       progress.value = { stage: 'done', total: files.length, processed: files.length }
     } catch (e) {
       progress.value = {
@@ -282,6 +318,7 @@ export const useModsStore = defineStore('mods', () => {
     dirHandle.value = null
     dirName.value = ''
     modFiles.value = []
+    mcVersion.value = ''
     progress.value = { stage: 'idle', total: 0, processed: 0 }
     await clearSavedHandle()
   }
@@ -295,9 +332,12 @@ export const useModsStore = defineStore('mods', () => {
     progress,
     scanning,
     search,
+    mcVersion,
     // computed
     filteredFiles,
     stats,
+    availableMcVersions,
+    inferredMcVersion,
     // actions
     restoreSavedHandle,
     selectFolder,
