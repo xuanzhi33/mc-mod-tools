@@ -91,6 +91,8 @@
     },
     "security": {
       "title": "Safety / Trust",
+      "highRisk": "High risk",
+      "mediumRisk": "Worth a look",
       "noWarnings": "No obvious risk found",
       "moderatorMessage": "Moderator message",
       "disclosure": "Declared disclosures",
@@ -146,14 +148,21 @@
         "processing": "Processing",
         "withheld": "Withheld",
         "scheduled": "Scheduled",
-        "private": "Private"
+        "private": "Private",
+        "unknown": "Unknown"
       },
       "versionStatus": {
         "listed": "Listed",
         "archived": "Archived",
         "draft": "Draft",
         "unlisted": "Unlisted",
-        "scheduled": "Scheduled"
+        "scheduled": "Scheduled",
+        "unknown": "Unknown"
+      },
+      "versionType": {
+        "release": "Release",
+        "beta": "Beta",
+        "alpha": "Alpha"
       },
       "monetizationStatus": {
         "monetized": "Monetized",
@@ -174,11 +183,17 @@
       },
       "warn": {
         "forceDemonetized": "Force-demonetized by Modrinth",
+        "demonetized": "Demonetized",
         "projectStatus": "Unusual project status: {status}",
         "requestedStatus": "Author requested status \"{status}\", which differs from the current one",
         "versionStatus": "This version's status: {status}",
+        "prerelease": "Current version is a pre-release ({type} build)",
+        "moderatorMessage": "Moderator note: {message}",
         "noSource": "No public source code and unclear license",
-        "embedded": "Bundles {n} embedded dependenc(ies)"
+        "embedded": "Bundles {n} embedded dependenc(ies)",
+        "stale": "Project hasn't been updated in over {years} year(s)",
+        "lowDownloads": "Current version has few downloads (under {n})",
+        "newRelease": "Current version is less than {days} days old"
       }
     }
   }

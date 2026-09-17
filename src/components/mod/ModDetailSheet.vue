@@ -14,7 +14,12 @@ import { Separator } from '@/components/ui/separator'
 import { Button } from '@/components/ui/button'
 import { formatBytes, formatDate, formatNumber } from '@/lib/format'
 import { fetchGitHubStars, parseGitHubRepo } from '@/lib/github'
-import { DISCLOSURE_SEVERITY, embeddedDependencyCount, isCustomLicense } from '@/lib/security'
+import {
+  DISCLOSURE_SEVERITY,
+  embeddedDependencyCount,
+  isCustomLicense,
+  securityWarnings,
+} from '@/lib/security'
 import type { DisclosureType, Environment, ModFile } from '@/types/mod'
 
 const props = defineProps<{ modelValue: boolean; mod: ModFile | null }>()
@@ -157,58 +162,8 @@ const communityLinks = computed(() => {
   return out
 })
 
-interface Warning {
-  text: string
-  level: 'high' | 'medium'
-}
-
 /** 风险提示（只列 important 的，完整信息在下方明细里） */
-const warnings = computed<Warning[]>(() => {
-  const p = props.mod?.project
-  const v = props.mod?.version
-  const out: Warning[] = []
-  if (!p) return out
-
-  if (p.monetization_status === 'force-demonetized') {
-    out.push({ text: t('mod.security.warn.forceDemonetized'), level: 'high' })
-  }
-  if (p.status && p.status !== 'approved') {
-    out.push({
-      text: t('mod.security.warn.projectStatus', {
-        status: label('mod.security.status', p.status),
-      }),
-      level: 'high',
-    })
-  }
-  if (p.requested_status && p.requested_status !== p.status) {
-    out.push({
-      text: t('mod.security.warn.requestedStatus', {
-        status: label('mod.security.status', p.requested_status),
-      }),
-      level: 'medium',
-    })
-  }
-  if (v?.status && v.status !== 'listed') {
-    out.push({
-      text: t('mod.security.warn.versionStatus', {
-        status: label('mod.security.versionStatus', v.status),
-      }),
-      level: 'medium',
-    })
-  }
-  for (const d of disclosures.value) {
-    if (DISCLOSURE_SEVERITY[d] === 'high') {
-      out.push({ text: label('mod.security.disclosureType', d), level: 'high' })
-    }
-  }
-  if (!p.source_url && isCustomLicense(p.license)) {
-    out.push({ text: t('mod.security.warn.noSource'), level: 'medium' })
-  }
-  if (embeddedDeps.value > 0) {
-    out.push({ text: t('mod.security.warn.embedded', { n: embeddedDeps.value }), level: 'medium' })
-  }
-  return out
-})
+const warnings = computed(() => securityWarnings(props.mod, { t, te }))
 </script>
 
 <template>

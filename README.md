@@ -11,8 +11,9 @@
 - **自动更新检查**：扫描末尾按 `加载器 + MC 版本` 调用 `/version_files/update`；已最新标绿，可更新标橙并显示新版本号
 - **安全 / 信任信息**：作者申报披露、审核与变现状态、许可证与公开源码、官方精选、内置依赖、SHA-1 + VirusTotal 直查、时间线
 - **工具栏**：搜索、文件总数、可更新数、加载器与 MC 版本下拉（自动推断，可手动改）
-- **详情侧滑面板**：项目 / 版本 / 文件信息 + 安全 / 信任信息（MC 版本与加载器默认折叠，可点击 `+N` 展开）
-- **其它**：未识别文件标红、新发布（<3 天）与低下载（<10 万）橙色高亮、中英文 i18n、深色模式
+- **风险标记**：模组名称右侧显示风险图标（红 = 高风险 / 橙 = 需要注意），悬停即可查看具体风险项
+- **详情侧滑面板**：项目 / 版本 / 安全 / 信任 / 文件信息（MC 版本与加载器默认折叠，可点击 `+N` 展开）
+- **其它**：未识别文件标红、新发布（<3 天）与低下载（<10 万）橙色高亮（同时计入风险提示）、中英文 i18n、深色模式
 
 ## 浏览器要求
 
@@ -35,7 +36,9 @@
 
 详情面板底部汇总，全部来自已获取的数据（**零额外请求**）：
 
-- **风险提示**：被官方强制取消变现、项目/版本状态异常、`requested_status` 与当前状态冲突、会与系统交互、无源码且许可证不明确、打包内置依赖
+- **风险提示**：按等级分红色（高）与橙色（中）两种
+  - **高**：被官方强制取消变现、项目被官方拒绝或下架（`rejected` / `withheld`）、会与系统交互
+  - **中**：项目 / 版本状态异常、已被取消变现、`requested_status` 与当前状态冲突、官方审核备注、作者申报归档 / 广告、无源码且许可证不明确、jar 内打包了依赖、当前版本为 Alpha / Beta、项目超过 2 年未更新、当前版本下载量偏低（<10 万）或发布于 3 天内（后两项同时也是表格里的橙色高亮字段）
 - **作者申报披露**：遥测（含 always-active / opt-out，仅作告知）、系统交互、广告、癫痫触发、付费功能、AI 内容等 15 种
 - 审核状态 · 通过时间、变现状态、许可证、公开源码、反馈渠道、所属组织、官方精选、运行环境、内置依赖
 - **哈希校验**：SHA-1 + 一键跳转 VirusTotal
@@ -71,12 +74,13 @@ src/
 │   ├── mc-version.ts  # MC 版本号比较
 │   ├── progress.ts    # 扫描阶段与总进度
 │   ├── update.ts      # 更新判定
-│   ├── security.ts    # 披露风险等级等安全信号
+│   ├── security.ts    # 披露风险等级与风险提示判定
+│   ├── github.ts      # 源码仓库星标查询
 │   ├── mod-status.ts  # 识别状态判定
 │   └── format.ts      # 数字 / 字节 / 日期格式化
 ├── stores/mods.ts     # 扫描主流程与推断逻辑
 ├── views/HomeView.vue
-├── components/mod/    # FolderPicker / ScanProgress / ModTable / ModDetailSheet / SettingsDialog / EmptyState
+├── components/mod/    # FolderPicker / ScanProgress / ModTable / ModRiskIcon / ModDetailSheet / SettingsDialog / EmptyState
 └── i18n/{zh,en}.json
 ```
 
@@ -89,5 +93,6 @@ A local-first, front-end-only Minecraft mod manager. Choose your `mods` folder (
 - identifies every jar via SHA-1 (batched Modrinth API calls, 100 per request)
 - checks for updates against the inferred loader + MC version (`/version_files/update`)
 - surfaces safety/trust signals from project metadata and author disclosures, plus a SHA-1 → VirusTotal link
+- flags risky mods inline (red = high, orange = moderate) with a hover tooltip listing every reason
 
 No backend; files never leave your machine (only hashes and project ids are sent to Modrinth). Requires a Chromium-based browser (≥ 86). Built with Vue 3, TypeScript, Vite, Pinia, Tailwind CSS v4, shadcn-vue and vue-i18n.

@@ -91,6 +91,8 @@
     },
     "security": {
       "title": "安全 / 信任",
+      "highRisk": "高风险",
+      "mediumRisk": "需要注意",
       "noWarnings": "未发现明显风险",
       "moderatorMessage": "审核备注",
       "disclosure": "作者申报披露",
@@ -146,14 +148,21 @@
         "processing": "审核中",
         "withheld": "已被官方下架",
         "scheduled": "已排期",
-        "private": "私有"
+        "private": "私有",
+        "unknown": "未知"
       },
       "versionStatus": {
         "listed": "已列出",
         "archived": "已归档",
         "draft": "草稿",
         "unlisted": "未列出",
-        "scheduled": "已排期"
+        "scheduled": "已排期",
+        "unknown": "未知"
+      },
+      "versionType": {
+        "release": "正式版",
+        "beta": "测试版（Beta）",
+        "alpha": "早期测试版（Alpha）"
       },
       "monetizationStatus": {
         "monetized": "已变现",
@@ -174,11 +183,17 @@
       },
       "warn": {
         "forceDemonetized": "该项目被官方强制取消变现",
+        "demonetized": "该项目已被取消变现",
         "projectStatus": "项目状态异常：{status}",
         "requestedStatus": "作者申请变更状态为「{status}」，与当前状态不一致",
         "versionStatus": "当前版本状态：{status}",
+        "prerelease": "当前版本是{type}",
+        "moderatorMessage": "官方审核备注：{message}",
         "noSource": "无公开源码，且许可证不明确",
-        "embedded": "打包内置了 {n} 个依赖（jar 内）"
+        "embedded": "打包内置了 {n} 个依赖（jar 内）",
+        "stale": "项目已超过 {years} 年未更新",
+        "lowDownloads": "当前版本下载量偏低（低于 {n}）",
+        "newRelease": "当前版本发布不足 {days} 天，尚未经受检验"
       }
     }
   }

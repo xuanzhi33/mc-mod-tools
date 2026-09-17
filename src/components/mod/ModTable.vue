@@ -11,9 +11,12 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
+import { TooltipProvider } from '@/components/ui/tooltip'
+import ModRiskIcon from '@/components/mod/ModRiskIcon.vue'
 import { useModsStore } from '@/stores/mods'
-import { formatBytes, formatCompactNumber, formatDate, isWithinDays } from '@/lib/format'
+import { formatBytes, formatCompactNumber, formatDate } from '@/lib/format'
 import { isUnrecognized } from '@/lib/mod-status'
+import { isLowDownloads, isNewRelease } from '@/lib/security'
 import { hasUpdate, isUpToDate } from '@/lib/update'
 import type { ModFile } from '@/types/mod'
 
@@ -37,124 +40,129 @@ const rows = computed(() => store.filteredFiles)
 </script>
 
 <template>
-  <div class="rounded-md border">
-    <Table class="border-separate border-spacing-0" container-class="md:overflow-visible">
-      <TableHeader
-        class="[&_th]:bg-background [&_th]:sticky [&_th]:top-0 [&_th]:z-10 [&_th]:border-b [&_tr]:border-b-0"
-      >
-        <TableRow>
-          <TableHead class="min-w-[220px]">{{ t('mod.col.modName') }}</TableHead>
-          <TableHead class="min-w-[110px]">{{ t('mod.col.version') }}</TableHead>
-          <TableHead>{{ t('mod.col.size') }}</TableHead>
-          <TableHead>{{ t('mod.col.mcVersions') }}</TableHead>
-          <TableHead>{{ t('mod.col.author') }}</TableHead>
-          <TableHead>{{ t('mod.col.published') }}</TableHead>
-          <TableHead>{{ t('mod.col.downloads') }}</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody class="[&>tr:not(:last-child)>td]:border-b">
-        <TableRow
-          v-for="m in rows"
-          :key="m.path"
-          tabindex="0"
-          class="focus-visible:bg-muted/50 cursor-pointer outline-none"
-          :class="isUnrecognized(m.status) && 'bg-destructive/10 hover:bg-destructive/15'"
-          @click="onRowClick(m)"
-          @keydown="onRowKeydown($event, m)"
+  <TooltipProvider :delay-duration="200">
+    <div class="rounded-md border">
+      <Table class="border-separate border-spacing-0" container-class="md:overflow-visible">
+        <TableHeader
+          class="[&_th]:bg-background [&_th]:sticky [&_th]:top-0 [&_th]:z-10 [&_th]:border-b [&_tr]:border-b-0"
         >
-          <TableCell class="font-medium">
-            <div class="flex items-center gap-2">
-              <img
-                v-if="m.project?.icon_url"
-                :src="m.project.icon_url"
-                :alt="m.project.title"
-                class="bg-muted size-6 shrink-0 rounded object-cover"
-                loading="lazy"
-              />
-              <div
-                v-else
-                class="bg-muted text-muted-foreground flex size-6 shrink-0 items-center justify-center rounded text-[10px]"
-              >
-                ?
-              </div>
-              <div class="min-w-0">
-                <div class="truncate">{{ m.project?.title ?? m.name }}</div>
-                <div class="text-muted-foreground truncate text-xs">{{ m.path }}</div>
-              </div>
-            </div>
-          </TableCell>
-          <TableCell class="font-mono text-xs whitespace-nowrap">
-            <template v-if="m.version">
-              <div
-                :class="
-                  hasUpdate(m) ? 'text-orange-500' : isUpToDate(m) ? 'text-emerald-500' : undefined
-                "
-              >
-                {{ m.version.version_number }}
-              </div>
-              <div
-                v-if="hasUpdate(m)"
-                class="text-muted-foreground mt-0.5 flex items-center gap-1 text-[11px]"
-              >
-                <ArrowUpRight class="size-3 shrink-0" />
-                <span>{{ m.update?.version_number }}</span>
-              </div>
-            </template>
-            <span v-else>—</span>
-          </TableCell>
-          <TableCell class="text-muted-foreground text-xs tabular-nums whitespace-nowrap">
-            {{ formatBytes(m.size) }}
-          </TableCell>
-          <TableCell>
-            <div v-if="m.version?.game_versions?.length" class="flex flex-wrap gap-1">
-              <Badge variant="outline" class="font-mono text-[11px]">
-                {{ m.version.game_versions.at(-1) }}
-              </Badge>
-              <Badge
-                v-if="m.version.game_versions.length > 1"
-                variant="outline"
-                class="text-[11px]"
-              >
-                +{{ m.version.game_versions.length - 1 }}
-              </Badge>
-            </div>
-            <span v-else class="text-muted-foreground text-xs">—</span>
-          </TableCell>
-          <TableCell class="text-sm">{{ m.project?.author ?? '—' }}</TableCell>
-          <TableCell
-            class="text-xs whitespace-nowrap"
-            :class="
-              isWithinDays(m.version?.date_published, 3)
-                ? 'text-orange-500'
-                : 'text-muted-foreground'
-            "
+          <TableRow>
+            <TableHead class="min-w-[220px]">{{ t('mod.col.modName') }}</TableHead>
+            <TableHead class="min-w-[110px]">{{ t('mod.col.version') }}</TableHead>
+            <TableHead>{{ t('mod.col.size') }}</TableHead>
+            <TableHead>{{ t('mod.col.mcVersions') }}</TableHead>
+            <TableHead>{{ t('mod.col.author') }}</TableHead>
+            <TableHead>{{ t('mod.col.published') }}</TableHead>
+            <TableHead>{{ t('mod.col.downloads') }}</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody class="[&>tr:not(:last-child)>td]:border-b">
+          <TableRow
+            v-for="m in rows"
+            :key="m.path"
+            tabindex="0"
+            class="focus-visible:bg-muted/50 cursor-pointer outline-none"
+            :class="isUnrecognized(m.status) && 'bg-destructive/10 hover:bg-destructive/15'"
+            @click="onRowClick(m)"
+            @keydown="onRowKeydown($event, m)"
           >
-            {{ formatDate(m.version?.date_published, locale) }}
-          </TableCell>
-          <TableCell class="tabular-nums">
-            <span
-              v-if="m.project"
-              class="inline-flex items-center gap-1"
-              :title="t('mod.downloadsHint')"
+            <TableCell class="font-medium">
+              <div class="flex items-center gap-2">
+                <img
+                  v-if="m.project?.icon_url"
+                  :src="m.project.icon_url"
+                  :alt="m.project.title"
+                  class="bg-muted size-6 shrink-0 rounded object-cover"
+                  loading="lazy"
+                />
+                <div
+                  v-else
+                  class="bg-muted text-muted-foreground flex size-6 shrink-0 items-center justify-center rounded text-[10px]"
+                >
+                  ?
+                </div>
+                <div class="min-w-0">
+                  <div class="flex items-center gap-1.5">
+                    <span class="truncate">{{ m.project?.title ?? m.name }}</span>
+                    <ModRiskIcon :mod="m" />
+                  </div>
+                  <div class="text-muted-foreground truncate text-xs">{{ m.path }}</div>
+                </div>
+              </div>
+            </TableCell>
+            <TableCell class="font-mono text-xs whitespace-nowrap">
+              <template v-if="m.version">
+                <div
+                  :class="
+                    hasUpdate(m)
+                      ? 'text-orange-500'
+                      : isUpToDate(m)
+                        ? 'text-emerald-500'
+                        : undefined
+                  "
+                >
+                  {{ m.version.version_number }}
+                </div>
+                <div
+                  v-if="hasUpdate(m)"
+                  class="text-muted-foreground mt-0.5 flex items-center gap-1 text-[11px]"
+                >
+                  <ArrowUpRight class="size-3 shrink-0" />
+                  <span>{{ m.update?.version_number }}</span>
+                </div>
+              </template>
+              <span v-else>—</span>
+            </TableCell>
+            <TableCell class="text-muted-foreground text-xs tabular-nums whitespace-nowrap">
+              {{ formatBytes(m.size) }}
+            </TableCell>
+            <TableCell>
+              <div v-if="m.version?.game_versions?.length" class="flex flex-wrap gap-1">
+                <Badge variant="outline" class="font-mono text-[11px]">
+                  {{ m.version.game_versions.at(-1) }}
+                </Badge>
+                <Badge
+                  v-if="m.version.game_versions.length > 1"
+                  variant="outline"
+                  class="text-[11px]"
+                >
+                  +{{ m.version.game_versions.length - 1 }}
+                </Badge>
+              </div>
+              <span v-else class="text-muted-foreground text-xs">—</span>
+            </TableCell>
+            <TableCell class="text-sm">{{ m.project?.author ?? '—' }}</TableCell>
+            <TableCell
+              class="text-xs whitespace-nowrap"
+              :class="isNewRelease(m) ? 'text-orange-500' : 'text-muted-foreground'"
             >
-              <Download class="size-3 shrink-0" />
-              <span v-if="m.version" :class="m.version.downloads < 100000 && 'text-orange-500'">
-                {{ formatCompactNumber(m.version.downloads) }}
+              {{ formatDate(m.version?.date_published, locale) }}
+            </TableCell>
+            <TableCell class="tabular-nums">
+              <span
+                v-if="m.project"
+                class="inline-flex items-center gap-1"
+                :title="t('mod.downloadsHint')"
+              >
+                <Download class="size-3 shrink-0" />
+                <span v-if="m.version" :class="isLowDownloads(m) && 'text-orange-500'">
+                  {{ formatCompactNumber(m.version.downloads) }}
+                </span>
+                <span>/</span>
+                <span class="text-muted-foreground">
+                  {{ formatCompactNumber(m.project.downloads) }}
+                </span>
               </span>
-              <span>/</span>
-              <span class="text-muted-foreground">
-                {{ formatCompactNumber(m.project.downloads) }}
-              </span>
-            </span>
-            <span v-else>—</span>
-          </TableCell>
-        </TableRow>
-        <TableRow v-if="rows.length === 0" class="hover:bg-transparent">
-          <TableCell :colspan="7" class="text-muted-foreground py-8 text-center">
-            {{ t('mod.noResults') }}
-          </TableCell>
-        </TableRow>
-      </TableBody>
-    </Table>
-  </div>
+              <span v-else>—</span>
+            </TableCell>
+          </TableRow>
+          <TableRow v-if="rows.length === 0" class="hover:bg-transparent">
+            <TableCell :colspan="7" class="text-muted-foreground py-8 text-center">
+              {{ t('mod.noResults') }}
+            </TableCell>
+          </TableRow>
+        </TableBody>
+      </Table>
+    </div>
+  </TooltipProvider>
 </template>
