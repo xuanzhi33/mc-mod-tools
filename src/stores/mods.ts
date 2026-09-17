@@ -16,6 +16,11 @@ import { compareMcVersions } from '@/lib/mc-version'
 
 const HASH_CONCURRENCY = 4
 
+/** 加载器并列时的优先顺序：fabric 优先 */
+function loaderRank(loader: string): number {
+  return loader === 'fabric' ? 0 : 1
+}
+
 /** 并发执行任务，限制最大并发数 */
 async function runWithConcurrency<T>(
   items: T[],
@@ -47,6 +52,7 @@ export const useModsStore = defineStore('mods', () => {
   const scanning = ref(false)
   const search = ref('')
   const mcVersion = ref('')
+  const loader = ref('')
 
   const filteredFiles = computed<ModFile[]>(() => {
     let list = modFiles.value
@@ -102,6 +108,29 @@ export const useModsStore = defineStore('mods', () => {
     return best
   })
 
+  /** 统计每个加载器被多少个已识别模组支持 */
+  function loaderCounts(): Map<string, number> {
+    const counts = new Map<string, number>()
+    for (const m of modFiles.value) {
+      for (const ld of m.version?.loaders ?? []) {
+        counts.set(ld, (counts.get(ld) ?? 0) + 1)
+      }
+    }
+    return counts
+  }
+
+  /** 当前已识别模组支持的加载器集合（按支持数降序，并列时 fabric 优先，其次字母序） */
+  const availableLoaders = computed<string[]>(() =>
+    [...loaderCounts().entries()]
+      .sort(
+        (a, b) => b[1] - a[1] || loaderRank(a[0]) - loaderRank(b[0]) || a[0].localeCompare(b[0]),
+      )
+      .map(([ld]) => ld),
+  )
+
+  /** 推断的加载器：出现次数最多，并列时优先 fabric */
+  const inferredLoader = computed<string>(() => availableLoaders.value[0] ?? '')
+
   /** 应用启动时恢复上次选择的文件夹句柄 */
   async function restoreSavedHandle(): Promise<boolean> {
     if (!supported) return false
@@ -127,6 +156,7 @@ export const useModsStore = defineStore('mods', () => {
     dirName.value = handle.name
     modFiles.value = []
     mcVersion.value = ''
+    loader.value = ''
     progress.value = { stage: 'idle', total: 0, processed: 0 }
     return true
   }
@@ -298,6 +328,9 @@ export const useModsStore = defineStore('mods', () => {
       if (!mcVersion.value || !availableMcVersions.value.includes(mcVersion.value)) {
         mcVersion.value = inferredMcVersion.value
       }
+      if (!loader.value || !availableLoaders.value.includes(loader.value)) {
+        loader.value = inferredLoader.value
+      }
 
       progress.value = { stage: 'done', total: files.length, processed: files.length }
     } catch (e) {
@@ -319,6 +352,7 @@ export const useModsStore = defineStore('mods', () => {
     dirName.value = ''
     modFiles.value = []
     mcVersion.value = ''
+    loader.value = ''
     progress.value = { stage: 'idle', total: 0, processed: 0 }
     await clearSavedHandle()
   }
@@ -333,11 +367,14 @@ export const useModsStore = defineStore('mods', () => {
     scanning,
     search,
     mcVersion,
+    loader,
     // computed
     filteredFiles,
     stats,
     availableMcVersions,
     inferredMcVersion,
+    availableLoaders,
+    inferredLoader,
     // actions
     restoreSavedHandle,
     selectFolder,

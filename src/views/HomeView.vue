@@ -155,6 +155,20 @@ onMounted(async () => {
             class="ml-auto flex items-center gap-2"
           >
             <span class="text-muted-foreground text-xs whitespace-nowrap">
+              {{ t('mod.loaderLabel') }}
+            </span>
+            <Select v-model="store.loader">
+              <SelectTrigger size="sm" class="w-28 font-mono">
+                <SelectValue>{{ store.loader }}</SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem v-for="ld in store.availableLoaders" :key="ld" :value="ld">
+                  {{ ld }}
+                </SelectItem>
+              </SelectContent>
+            </Select>
+
+            <span class="text-muted-foreground ml-2 text-xs whitespace-nowrap">
               {{ t('mod.mcVersionLabel') }}
             </span>
             <Select v-model="store.mcVersion">

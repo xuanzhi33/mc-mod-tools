@@ -46,6 +46,7 @@
     "searchClear": "清除搜索",
     "downloadsHint": "本版本下载量 / 项目总下载量",
     "mcVersionLabel": "MC 版本",
+    "loaderLabel": "加载器",
     "noResults": "没有匹配的模组",
     "stage": {
       "listing": "正在列出 jar 文件…",

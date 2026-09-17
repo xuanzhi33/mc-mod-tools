@@ -46,6 +46,7 @@
     "searchClear": "Clear search",
     "downloadsHint": "Version downloads / Project total",
     "mcVersionLabel": "MC version",
+    "loaderLabel": "Loader",
     "noResults": "No matching mods",
     "stage": {
       "listing": "Listing jar files…",
