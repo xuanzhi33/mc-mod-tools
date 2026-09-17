@@ -86,6 +86,97 @@
       "fileSize": "文件大小",
       "error": "错误信息",
       "viewVersion": "查看版本"
+    },
+    "security": {
+      "title": "安全 / 信任",
+      "noWarnings": "未发现明显风险",
+      "moderatorMessage": "审核备注",
+      "disclosure": "作者申报披露",
+      "disclosureNone": "未申报任何披露（不代表不存在）",
+      "reviewStatus": "审核状态",
+      "monetization": "变现状态",
+      "license": "许可证",
+      "licenseCustom": "自定义",
+      "source": "公开源码",
+      "notProvided": "未提供",
+      "community": "反馈渠道",
+      "issues": "问题反馈",
+      "wiki": "文档",
+      "discord": "Discord",
+      "organization": "所属组织",
+      "featured": "官方精选",
+      "environment": "运行环境",
+      "embeddedDeps": "内置依赖",
+      "embeddedNone": "无",
+      "embeddedCount": "{n} 个",
+      "hash": "哈希校验",
+      "virusTotal": "VirusTotal 查询",
+      "timeline": "时间线",
+      "created": "创建",
+      "updated": "最近更新",
+      "versionPublished": "当前版本",
+      "yes": "是",
+      "no": "否",
+      "disclosureType": {
+        "ai_content": "AI 生成内容",
+        "ai_content_code": "AI 生成代码",
+        "ai_content_assets": "AI 生成素材",
+        "ai_content_text": "AI 生成文本",
+        "ai_functionality": "包含 AI 功能",
+        "advertisements": "包含广告",
+        "epilepsy_triggers": "可能诱发光敏反应",
+        "system_interactions": "会与系统交互",
+        "telemetry": "包含遥测",
+        "telemetry_opt_in": "遥测（可选开启）",
+        "telemetry_opt_out": "遥测（默认开启）",
+        "telemetry_always_active": "遥测（始终开启）",
+        "derivative_work": "二创 / 衍生作品",
+        "paid_features": "包含付费功能",
+        "archived": "已归档"
+      },
+      "status": {
+        "approved": "已通过",
+        "archived": "已归档",
+        "rejected": "已被拒绝",
+        "draft": "草稿",
+        "unlisted": "未列出",
+        "processing": "审核中",
+        "withheld": "已被官方下架",
+        "scheduled": "已排期",
+        "private": "私有"
+      },
+      "versionStatus": {
+        "listed": "已列出",
+        "archived": "已归档",
+        "draft": "草稿",
+        "unlisted": "未列出",
+        "scheduled": "已排期"
+      },
+      "monetizationStatus": {
+        "monetized": "已变现",
+        "demonetized": "未变现",
+        "force-demonetized": "被官方强制取消变现"
+      },
+      "environmentValue": {
+        "client_and_server": "客户端 + 服务端",
+        "client_only": "仅客户端",
+        "client_only_server_optional": "客户端（服务端可选）",
+        "singleplayer_only": "仅单人",
+        "server_only": "仅服务端",
+        "server_only_client_optional": "服务端（客户端可选）",
+        "dedicated_server_only": "仅专用服务端",
+        "client_or_server": "客户端或服务端",
+        "client_or_server_prefers_both": "客户端或服务端（偏向两者）",
+        "unknown": "未知"
+      },
+      "warn": {
+        "forceDemonetized": "该项目被官方强制取消变现",
+        "projectStatus": "项目状态异常：{status}",
+        "requestedStatus": "作者申请变更状态为「{status}」，与当前状态不一致",
+        "versionStatus": "当前版本状态：{status}",
+        "noSource": "无公开源码，且许可证不明确",
+        "embedded": "打包内置了 {n} 个依赖（jar 内）"
+      }
     }
   }
 }

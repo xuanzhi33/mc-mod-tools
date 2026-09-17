@@ -12,7 +12,7 @@ import {
 } from '@/lib/fs'
 import { computeSha1 } from '@/lib/hash'
 import {
-  fetchProjectAuthors,
+  fetchProjectSearchMeta,
   fetchProjectsByIds,
   fetchUpdatedVersions,
   fetchVersionsByHashes,
@@ -375,7 +375,7 @@ export const useModsStore = defineStore('mods', () => {
 
       if (cancelled) return
 
-      // 5. 批量查询作者（项目接口不返回 author，需走 search 接口）
+      // 5. 批量查询 search 元信息（作者 + 内容披露，项目接口不返回）
       const authorIds = [...matchedProjectIds]
       if (authorIds.length > 0) {
         progress.value = {
@@ -383,14 +383,17 @@ export const useModsStore = defineStore('mods', () => {
           total: authorIds.length,
           processed: 0,
         }
-        const authorMap = await fetchProjectAuthors(authorIds, (done, total) => {
+        const metaMap = await fetchProjectSearchMeta(authorIds, (done, total) => {
           progress.value = { stage: 'querying-authors', total, processed: done }
         })
         for (const m of modFiles.value) {
           const pid = m.version?.project_id
-          if (pid && m.project && authorMap[pid]) {
-            m.project.author = authorMap[pid]
-          }
+          if (!pid || !m.project) continue
+          const meta = metaMap[pid]
+          if (!meta) continue
+          if (meta.author) m.project.author = meta.author
+          if (meta.disclosureTypes) m.project.disclosure_types = meta.disclosureTypes
+          if (meta.organization) m.project.organization_name = meta.organization
         }
       }
 

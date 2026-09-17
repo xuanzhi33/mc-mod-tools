@@ -86,6 +86,97 @@
       "fileSize": "File Size",
       "error": "Error",
       "viewVersion": "View Version"
+    },
+    "security": {
+      "title": "Safety / Trust",
+      "noWarnings": "No obvious risk found",
+      "moderatorMessage": "Moderator message",
+      "disclosure": "Declared disclosures",
+      "disclosureNone": "No disclosures declared (not proof of absence)",
+      "reviewStatus": "Review status",
+      "monetization": "Monetization",
+      "license": "License",
+      "licenseCustom": "custom",
+      "source": "Source code",
+      "notProvided": "Not provided",
+      "community": "Community",
+      "issues": "Issues",
+      "wiki": "Wiki",
+      "discord": "Discord",
+      "organization": "Organization",
+      "featured": "Featured",
+      "environment": "Environment",
+      "embeddedDeps": "Embedded deps",
+      "embeddedNone": "None",
+      "embeddedCount": "{n}",
+      "hash": "Hash check",
+      "virusTotal": "Look up on VirusTotal",
+      "timeline": "Timeline",
+      "created": "Created",
+      "updated": "Updated",
+      "versionPublished": "This version",
+      "yes": "Yes",
+      "no": "No",
+      "disclosureType": {
+        "ai_content": "AI-generated content",
+        "ai_content_code": "AI-generated code",
+        "ai_content_assets": "AI-generated assets",
+        "ai_content_text": "AI-generated text",
+        "ai_functionality": "AI features",
+        "advertisements": "Contains ads",
+        "epilepsy_triggers": "Epilepsy triggers",
+        "system_interactions": "Interacts with your system",
+        "telemetry": "Includes telemetry",
+        "telemetry_opt_in": "Telemetry (opt-in)",
+        "telemetry_opt_out": "Telemetry (opt-out)",
+        "telemetry_always_active": "Telemetry (always active)",
+        "derivative_work": "Derivative work",
+        "paid_features": "Paid features",
+        "archived": "Archived"
+      },
+      "status": {
+        "approved": "Approved",
+        "archived": "Archived",
+        "rejected": "Rejected",
+        "draft": "Draft",
+        "unlisted": "Unlisted",
+        "processing": "Processing",
+        "withheld": "Withheld",
+        "scheduled": "Scheduled",
+        "private": "Private"
+      },
+      "versionStatus": {
+        "listed": "Listed",
+        "archived": "Archived",
+        "draft": "Draft",
+        "unlisted": "Unlisted",
+        "scheduled": "Scheduled"
+      },
+      "monetizationStatus": {
+        "monetized": "Monetized",
+        "demonetized": "Not monetized",
+        "force-demonetized": "Force demonetized"
+      },
+      "environmentValue": {
+        "client_and_server": "Client + server",
+        "client_only": "Client only",
+        "client_only_server_optional": "Client (server optional)",
+        "singleplayer_only": "Singleplayer only",
+        "server_only": "Server only",
+        "server_only_client_optional": "Server (client optional)",
+        "dedicated_server_only": "Dedicated server only",
+        "client_or_server": "Client or server",
+        "client_or_server_prefers_both": "Client or server (prefers both)",
+        "unknown": "Unknown"
+      },
+      "warn": {
+        "forceDemonetized": "Force-demonetized by Modrinth",
+        "projectStatus": "Unusual project status: {status}",
+        "requestedStatus": "Author requested status \"{status}\", which differs from the current one",
+        "versionStatus": "This version's status: {status}",
+        "noSource": "No public source code and unclear license",
+        "embedded": "Bundles {n} embedded dependenc(ies)"
+      }
     }
   }
 }

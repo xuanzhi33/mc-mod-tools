@@ -3,7 +3,7 @@
  * 文档：https://docs.modrinth.com/
  */
 
-import type { ModrinthProject, ModrinthVersion } from '@/types/mod'
+import type { DisclosureType, ModrinthProject, ModrinthVersion } from '@/types/mod'
 
 const API_BASE = 'https://api.modrinth.com/v2'
 
@@ -107,21 +107,33 @@ export async function fetchProjectsByIds(
 interface SearchHit {
   project_id: string
   author: string
+  disclosure_types?: DisclosureType[]
+  organization?: string | null
+}
+
+/** search 接口额外提供的项目元信息（项目接口不返回） */
+export interface ProjectSearchMeta {
+  /** 作者用户名 */
+  author?: string
+  /** 作者申报的内容披露 */
+  disclosureTypes?: DisclosureType[]
+  /** 组织名（项目接口只返回组织 id） */
+  organization?: string | null
 }
 
 /**
- * 根据 project id 批量查询作者。
+ * 根据 project id 批量查询 search 元信息：作者 + 内容披露。
  *
- * 注意：`GET /v2/projects` 不返回 `author`，只有 search 接口会返回，
- * 且与 Modrinth 官网展示的作者一致。这里用 `project_id` facet 批量获取，
- * 每批 100 个，返回 id -> author 映射。
+ * 注意：`GET /v2/projects` 既不返回 `author` 也不返回 `disclosure_types`，
+ * 只有 search 接口会返回，且作者与 Modrinth 官网展示的一致。
+ * 这里用 `project_id` facet 批量获取，每批 100 个。
  * 未在搜索结果中的项目（如未列出/未通过审核）不会有对应条目。
  */
-export async function fetchProjectAuthors(
+export async function fetchProjectSearchMeta(
   ids: string[],
   onProgress?: (done: number, total: number) => void,
-): Promise<Record<string, string>> {
-  const result: Record<string, string> = {}
+): Promise<Record<string, ProjectSearchMeta>> {
+  const result: Record<string, ProjectSearchMeta> = {}
   const unique = [...new Set(ids.filter(Boolean))]
   const total = unique.length
   let done = 0
@@ -133,7 +145,11 @@ export async function fetchProjectAuthors(
       `${API_BASE}/search?limit=${SEARCH_BATCH}&facets=${encodeURIComponent(facets)}`,
     )
     for (const hit of data.hits ?? []) {
-      if (hit.author) result[hit.project_id] = hit.author
+      result[hit.project_id] = {
+        author: hit.author || undefined,
+        disclosureTypes: hit.disclosure_types ?? [],
+        organization: hit.organization ?? null,
+      }
     }
     done += batch.length
     onProgress?.(done, total)
