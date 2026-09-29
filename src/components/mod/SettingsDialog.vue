@@ -8,10 +8,11 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { AppWindow, Languages, Settings, SunMoon } from 'lucide-vue-next'
+import { AppWindow, ExternalLink, Languages, Settings, SunMoon } from 'lucide-vue-next'
 
 const props = defineProps<{ modelValue: boolean }>()
 const emit = defineEmits<{ 'update:modelValue': [v: boolean] }>()
@@ -79,6 +80,19 @@ const sectionTitleClass = 'font-semibold text-muted-foreground border-b pb-2'
           />
         </section>
       </div>
+
+      <DialogFooter class="flex-row items-center justify-between text-xs text-muted-foreground">
+        <span>{{ t('settings.footer.author') }}</span>
+        <a
+          href="https://github.com/xuanzhi33/mc-mod-tools"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex items-center gap-1 hover:text-foreground"
+        >
+          <ExternalLink class="size-3" />
+          {{ t('settings.footer.repo') }}
+        </a>
+      </DialogFooter>
     </DialogContent>
   </Dialog>
 </template>

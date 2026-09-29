@@ -17,6 +17,10 @@
         "en": "English",
         "zh": "Chinese (Simplified) - 简体中文"
       }
+    },
+    "footer": {
+      "author": "by xuanzhi33",
+      "repo": "Repo"
     }
   },
   "mod": {
