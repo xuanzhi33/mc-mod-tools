@@ -97,3 +97,9 @@ A local-first, front-end-only Minecraft mod manager. Choose your `mods` folder (
 - flags risky mods inline (red = high, orange = moderate) with a hover tooltip listing every reason
 
 No backend; files never leave your machine (only hashes and project ids are sent to Modrinth). Requires a Chromium-based browser (≥ 86). Built with Vue 3, TypeScript, Vite, Pinia, Tailwind CSS v4, shadcn-vue and vue-i18n.
+
+---
+
+## 许可证 / License
+
+[AGPL-3.0-or-later](LICENSE) © xuanzhi33
