@@ -14,8 +14,8 @@ export default defineConfig({
     },
   },
   server: {
-    host: '0.0.0.0',
-    allowedHosts: ['.cnb.run'],
+    // 仅监听 IPv4 回环地址，不对外网暴露
+    host: '127.0.0.1',
   },
   base: './',
 })
